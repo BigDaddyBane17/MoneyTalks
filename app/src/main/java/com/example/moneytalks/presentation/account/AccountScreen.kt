@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -49,7 +50,8 @@ fun AccountScreen(viewModel: AccountViewModel = viewModel()) {
                     onClick = {
                         viewModel.handleIntent(AccountIntent.BalanceClick)
                     },
-                    leadingIcon = "\uD83D\uDCB0"
+                    leadingIcon = "\uD83D\uDCB0",
+                    modifier = Modifier.height(56.dp)
                 )
                 HorizontalDivider()
                 ListItem(
@@ -60,7 +62,8 @@ fun AccountScreen(viewModel: AccountViewModel = viewModel()) {
                     trailingIcon = R.drawable.more_vert,
                     onClick = {
                         viewModel.handleIntent(AccountIntent.CurrencyClick)
-                    }
+                    },
+                    modifier = Modifier.height(56.dp)
                 )
             }
         }

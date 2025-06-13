@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -44,6 +45,7 @@ fun SpendingScreen(viewModel: SpendingViewModel = viewModel()) {
 
             Column {
                 ListItem(
+                    modifier = Modifier.height(56.dp),
                     title = "Всего",
                     amount = state.total,
                     backgroundColor = Color(0xFFD4FAE6),
@@ -65,7 +67,8 @@ fun SpendingScreen(viewModel: SpendingViewModel = viewModel()) {
                             contentPadding = if (item.description != null)
                                 PaddingValues(vertical = 16.dp, horizontal = 16.dp)
                             else PaddingValues(vertical = 24.dp, horizontal = 16.dp),
-                            currency = item.currency
+                            currency = item.currency,
+                            modifier = Modifier
                         )
                         HorizontalDivider()
                     }

@@ -25,14 +25,6 @@ class AccountViewModel() : ViewModel() {
         }
     }
 
-    private fun goToBalance() {
-
-    }
-
-    private fun changeCurrency() {
-
-    }
-
     private fun loadAccount() {
         _uiState.value = AccountUiState.Loading
         viewModelScope.launch {
@@ -43,7 +35,15 @@ class AccountViewModel() : ViewModel() {
         }
     }
 
-    fun createAccount() {
+    private fun goToBalance() {
+
+    }
+
+    private fun changeCurrency() {
+
+    }
+
+    private fun createAccount() {
 
     }
 

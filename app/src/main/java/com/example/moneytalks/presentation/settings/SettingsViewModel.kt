@@ -1,12 +1,9 @@
 package com.example.moneytalks.presentation.settings
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class SettingsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
@@ -22,21 +19,18 @@ class SettingsViewModel : ViewModel() {
 
     private fun loadSettings() {
         _uiState.value = SettingsUiState.Loading
-        viewModelScope.launch {
-            delay(300) // Имитация загрузки данных (например, из DataStore)
-            _uiState.value = SettingsUiState.Success(
-                isDarkMode = false,
-                settingsList = listOf(
-                    "Основной цвет",
-                    "Звуки",
-                    "Хаптики",
-                    "Код пароль",
-                    "Синхронизация",
-                    "Язык",
-                    "О программе"
-                )
+        _uiState.value = SettingsUiState.Success(
+            isDarkMode = false,
+            settingsList = listOf(
+                "Основной цвет",
+                "Звуки",
+                "Хаптики",
+                "Код пароль",
+                "Синхронизация",
+                "Язык",
+                "О программе"
             )
-        }
+        )
     }
 
     private fun toggleDarkMode(enabled: Boolean) {

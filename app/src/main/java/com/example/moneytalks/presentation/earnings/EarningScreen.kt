@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -51,7 +52,8 @@ fun EarningsScreen(viewModel: EarningsViewModel = viewModel()) {
                     title = "Всего",
                     amount = totalAmount,
                     backgroundColor = Color(0xFFD4FAE6),
-                    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
+                    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+                    modifier = Modifier.height(56.dp)
                 )
                 HorizontalDivider()
 
@@ -61,7 +63,8 @@ fun EarningsScreen(viewModel: EarningsViewModel = viewModel()) {
                             title = item.title,
                             amount = "${item.amount} ${item.currency}",
                             trailingIcon = R.drawable.more_vert,
-                            onClick = { viewModel.handleIntent(EarningsIntent.OnItemClicked) }
+                            onClick = { viewModel.handleIntent(EarningsIntent.OnItemClicked) },
+                            modifier = Modifier
                         )
                         HorizontalDivider()
                     }

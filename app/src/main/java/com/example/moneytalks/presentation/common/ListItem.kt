@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun ListItem(
+    modifier: Modifier,
     leadingIcon: String? = null,
     title: String,
     description: String? = null,
@@ -37,7 +39,7 @@ fun ListItem(
 ) {
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .then(
                 onClick?.let {
@@ -46,6 +48,7 @@ fun ListItem(
                     }
                 } ?: Modifier
             )
+            .height(72.dp)
             .background(backgroundColor)
             .padding(contentPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -56,15 +59,9 @@ fun ListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (leadingIcon != null) {
-//                Image(
-//                    painter = painterResource(leadingIcon),
-//                    contentDescription = "Leading Icon",
-//                    modifier = Modifier.size(24.dp)
-//                )
-
                 Text(
                     text = leadingIcon,
-                    fontSize = 22.sp
+                    fontSize = 22.sp,
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))

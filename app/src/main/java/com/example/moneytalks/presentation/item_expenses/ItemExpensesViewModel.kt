@@ -46,16 +46,7 @@ class ItemExpensesViewModel : ViewModel() {
     }
 
     private fun searchItemExpenses(query: String) {
-        val filtered = if (query.isBlank()) {
-            allExpenses
-        } else {
-            allExpenses.filter { it.title.contains(query, ignoreCase = true) }
-        }
-        _uiState.value = ItemExpenseUiState.Success(
-            items = allExpenses,
-            filteredExpenses = filtered,
-            searchQuery = query
-        )
+        //TODO
     }
 
 }

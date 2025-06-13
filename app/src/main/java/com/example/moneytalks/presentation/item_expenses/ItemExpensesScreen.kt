@@ -65,7 +65,8 @@ fun ItemExpensesScreen(
                             contentPadding = PaddingValues(
                                 horizontal = 16.dp,
                                 vertical = 20.dp
-                            )
+                            ),
+                            modifier = Modifier
                         )
                         HorizontalDivider()
                     }

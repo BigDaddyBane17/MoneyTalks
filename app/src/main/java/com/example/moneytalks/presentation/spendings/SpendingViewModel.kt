@@ -27,7 +27,7 @@ class SpendingViewModel: ViewModel() {
         viewModelScope.launch {
             _uiState.value = SpendingUiState.Loading
             try {
-                delay(400)
+                delay(300)
                 val expensesList = listOf(
                     Expenses(
                         id = 1,
@@ -101,18 +101,17 @@ class SpendingViewModel: ViewModel() {
         }
     }
 
-    fun handleItemClick() {
+    private fun handleItemClick() {
         //TODO
     }
 
-    fun addExpense() {
+    private fun addExpense() {
         //TODO
     }
 
-    fun goToHistory() {
+    private fun goToHistory() {
         //TODO
     }
-
 
 }
 
