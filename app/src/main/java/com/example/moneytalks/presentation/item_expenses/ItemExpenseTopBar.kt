@@ -6,12 +6,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.moneytalks.presentation.common.AppBarProvider
 
 object ItemExpenseTopBar : AppBarProvider {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun provideTopBar() {
+    override fun provideTopBar(navController: NavHostController) {
         CenterAlignedTopAppBar(
             title = {
                 Text("Мои статьи")

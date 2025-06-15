@@ -12,8 +12,7 @@ fun SettingsNavHost() {
     val settingsNavController = rememberNavController()
     NavHost(settingsNavController, startDestination = "настройки") {
         composable("настройки") {
-            SettingsScreen(
-            )
+
         }
     }
 }

@@ -22,10 +22,15 @@ import com.example.moneytalks.presentation.common.ListItem
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 
 
 @Composable
-fun SpendingScreen(viewModel: SpendingViewModel = viewModel()) {
+fun SpendingScreen(
+    viewModel: SpendingViewModel = viewModel(),
+    navController: NavHostController
+) {
 
     val uiState by viewModel.uiState.collectAsState()
 

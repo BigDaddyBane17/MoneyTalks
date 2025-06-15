@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.accompanist.systemuicontroller)
 
 }

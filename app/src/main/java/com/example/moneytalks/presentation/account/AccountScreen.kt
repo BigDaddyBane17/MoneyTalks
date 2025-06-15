@@ -18,11 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.ListItem
 
 @Composable
-fun AccountScreen(viewModel: AccountViewModel = viewModel()) {
+fun AccountScreen(
+    viewModel: AccountViewModel = viewModel(),
+    navController: NavHostController
+) {
 
     val uiState by viewModel.uiState.collectAsState()
 

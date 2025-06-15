@@ -8,10 +8,9 @@ import com.example.moneytalks.presentation.account.AccountScreen
 
 @Composable
 fun AccountNavHost() {
-    val settingsNavController = rememberNavController()
-    NavHost(settingsNavController, startDestination = "счет") {
+    val accountNavController = rememberNavController()
+    NavHost(accountNavController, startDestination = "счет") {
         composable("счет") {
-            AccountScreen()
         }
     }
 }

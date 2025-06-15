@@ -8,11 +8,11 @@ import com.example.moneytalks.presentation.earnings.EarningsScreen
 
 @Composable
 fun IncomeNavHost() {
-    val chatNavController = rememberNavController()
-    NavHost(chatNavController, startDestination = "доходы") {
+    val incomeNavController = rememberNavController()
+    NavHost(incomeNavController, startDestination = "доходы") {
         composable("доходы") {
-            EarningsScreen()
         }
+
     }
 }
 

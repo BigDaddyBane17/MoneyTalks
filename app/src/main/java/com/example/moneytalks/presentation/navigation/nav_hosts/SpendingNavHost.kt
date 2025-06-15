@@ -4,19 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.moneytalks.presentation.spendings.SpendingScreen
 
 
 @Composable
 fun SpendingNavHost() {
-    val navController = rememberNavController()
-
+    val spendingNavController = rememberNavController()
     NavHost(
-        navController = navController,
+        navController = spendingNavController,
         startDestination = "расходы"
     ) {
         composable("расходы") {
-            SpendingScreen()
         }
+
     }
 }

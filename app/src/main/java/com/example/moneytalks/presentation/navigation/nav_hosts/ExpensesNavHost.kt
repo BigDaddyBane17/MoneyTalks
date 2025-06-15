@@ -8,10 +8,9 @@ import com.example.moneytalks.presentation.item_expenses.ItemExpensesScreen
 
 @Composable
 fun ExpensesNavHost() {
-    val settingsNavController = rememberNavController()
-    NavHost(settingsNavController, startDestination = "статьи") {
+    val expensesNavController = rememberNavController()
+    NavHost(expensesNavController, startDestination = "статьи") {
         composable("статьи") {
-            ItemExpensesScreen()
         }
     }
 }
