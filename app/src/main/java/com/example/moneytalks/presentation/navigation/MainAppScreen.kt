@@ -2,7 +2,6 @@ package com.example.moneytalks.presentation.navigation
 
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,11 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -33,10 +28,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.moneytalks.presentation.account.AccountTopBar
+import com.example.moneytalks.presentation.analysis.AnalysisTopBar
 import com.example.moneytalks.presentation.common.NoTopBar
 import com.example.moneytalks.presentation.create_transaction.CreateTransactionTopBar
 import com.example.moneytalks.presentation.earnings.EarningsTopBar
-import com.example.moneytalks.presentation.history.HistoryScreen
 import com.example.moneytalks.presentation.history.HistoryTopBar
 import com.example.moneytalks.presentation.item_expenses.ItemExpenseTopBar
 import com.example.moneytalks.presentation.settings.SettingsTopBar
@@ -44,55 +39,43 @@ import com.example.moneytalks.presentation.spendings.SpendingTopBar
 
 @Composable
 fun MainAppScreen() {
-    val navControllers = tabRoutes.map { rememberNavController() }
-    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-
-    var tabHistory by rememberSaveable { mutableStateOf(listOf(0)) }
-
-    LaunchedEffect(selectedTab) {
-        if (tabHistory.lastOrNull() != selectedTab) {
-            tabHistory = tabHistory + selectedTab
-        }
-    }
-
-    val currentNavController = navControllers[selectedTab]
-    val currentBackStackEntry by currentNavController.currentBackStackEntryAsState()
+    val navController = rememberNavController()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
-    BackHandler {
-        if (currentNavController.previousBackStackEntry != null) {
-            currentNavController.popBackStack()
-        }
-        else if (tabHistory.size > 1) {
-            tabHistory = tabHistory.dropLast(1)
-            selectedTab = tabHistory.last()
-        }
+    val tabRoutes = listOf(
+        "расходы_граф", "доходы_граф", "счет_граф", "статьи_граф", "настройки_граф"
+    )
 
-    }
+    val selectedTab = tabRoutes.indexOfFirst {
+        currentRoute?.startsWith(it.removeSuffix("_граф")) == true
+    }.let { if (it == -1) 0 else it }
 
     val topBarProvider = when (tabRoutes[selectedTab]) {
-        "расходы" -> when (currentRoute) {
-            "расходы_история" -> HistoryTopBar
-            "расходы_добавить" -> CreateTransactionTopBar
+        "расходы_граф" -> when (currentRoute) {
+            "расходы_история" -> HistoryTopBar("расходы")
+            "расходы_добавить" -> CreateTransactionTopBar("расходы")
+            "расходы_анализ" -> AnalysisTopBar
             else -> SpendingTopBar
         }
-        "доходы" -> EarningsTopBar
-        "счет" -> AccountTopBar
-        "статьи" -> ItemExpenseTopBar
-        "настройки" -> SettingsTopBar
+        "доходы_граф" -> when (currentRoute) {
+            "доходы_история" -> HistoryTopBar("доходы")
+            "доходы_добавить" -> CreateTransactionTopBar("доходы")
+            "доходы_анализ" -> AnalysisTopBar
+            else -> EarningsTopBar
+        }
+        "счет_граф" -> AccountTopBar
+        "статьи_граф" -> ItemExpenseTopBar
+        "настройки_граф" -> SettingsTopBar
         else -> NoTopBar
     }
 
     Scaffold(
         topBar = {
-            topBarProvider.provideTopBar(currentNavController)
+            topBarProvider.provideTopBar(navController)
         },
-
-
         bottomBar = {
-            NavigationBar(
-                containerColor = Color(0xFFF3EDF7)
-            ) {
+            NavigationBar(containerColor = Color(0xFFF3EDF7)) {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         selected = selectedTab == index,
@@ -114,21 +97,33 @@ fun MainAppScreen() {
                             selectedIconColor = Color(0xFF2AE881),
                             indicatorColor = Color(0xFFD4FAE6),
                         ),
-                        onClick = { selectedTab = index }
+                        onClick = {
+                            val tabRoute = tabRoutes[index]
+                            navController.navigate(tabRoute) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
                     )
                 }
             }
         },
         floatingActionButton = {
-            if (currentRoute == "расходы" || currentRoute == "доходы" || currentRoute == "счет") {
+            if (currentRoute == "расходы" ||
+                currentRoute == "доходы"
+            ) {
                 FloatingActionButton(
                     onClick = {
-                        when(currentRoute) {
-                            "расходы" -> {
-                                currentNavController.navigate("расходы_добавить")
+                        when {
+                            currentRoute.startsWith("расходы") == true -> {
+                                navController.navigate("расходы_добавить")
                             }
-                            "доходы" -> {}
-                            "счет" -> {}
+                            currentRoute.startsWith("доходы") == true -> {
+                                navController.navigate("доходы_добавить")
+                            }
                         }
                     },
                     containerColor = Color(0xFF2AE881),
@@ -141,10 +136,9 @@ fun MainAppScreen() {
         },
         containerColor = Color(0xFFFef7ff)
     ) { padding ->
-        Box(Modifier.padding(padding)) {
-            tabRoutes.forEachIndexed { index, tabRoute ->
-                TabNavHost(navController = navControllers[selectedTab], tabRoute = tabRoutes[selectedTab])
-            }
-        }
+        TabNavHost(
+            navController = navController,
+            modifier = Modifier.padding(padding)
+        )
     }
 }

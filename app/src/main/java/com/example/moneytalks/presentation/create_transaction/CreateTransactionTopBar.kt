@@ -13,13 +13,13 @@ import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.AppBarProvider
 
-object CreateTransactionTopBar : AppBarProvider {
+class CreateTransactionTopBar(val type: String) : AppBarProvider {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun provideTopBar(navController: NavHostController) {
         CenterAlignedTopAppBar(
             title = {
-                Text("Мои расходы")
+                Text("Мои $type")
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = Color(0xFF2AE881)

@@ -64,5 +64,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.datetime)
+
 
 }

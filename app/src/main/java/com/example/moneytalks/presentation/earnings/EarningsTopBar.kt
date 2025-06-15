@@ -26,7 +26,9 @@ object EarningsTopBar : AppBarProvider {
                 containerColor = Color(0xFF2AE881)
             ),
             actions = {
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    navController.navigate("доходы_история")
+                }) {
                     Icon(
                         painter = painterResource(id = R.drawable.clocks),
                         contentDescription = "Счет",

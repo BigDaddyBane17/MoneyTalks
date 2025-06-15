@@ -1,4 +1,4 @@
-package com.example.moneytalks.presentation.history
+package com.example.moneytalks.presentation.analysis
 
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,13 +13,13 @@ import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.AppBarProvider
 
-class HistoryTopBar(val type: String) : AppBarProvider {
+object AnalysisTopBar : AppBarProvider {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun provideTopBar(navController: NavHostController) {
         CenterAlignedTopAppBar(
             title = {
-                Text("Моя история")
+                Text("Анализ")
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = Color(0xFF2AE881)
@@ -34,16 +34,6 @@ class HistoryTopBar(val type: String) : AppBarProvider {
                     )
                 }
             },
-            actions = {
-                IconButton(onClick = {
-                    navController.navigate("${type}_анализ")
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.history),
-                        contentDescription = "История"
-                    )
-                }
-            }
         )
     }
 }
