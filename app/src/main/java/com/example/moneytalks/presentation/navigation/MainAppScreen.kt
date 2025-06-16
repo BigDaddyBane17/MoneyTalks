@@ -1,8 +1,4 @@
 package com.example.moneytalks.presentation.navigation
-
-
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -16,9 +12,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -30,8 +24,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moneytalks.presentation.account.AccountTopBar
 import com.example.moneytalks.presentation.analysis.AnalysisTopBar
 import com.example.moneytalks.presentation.common.NoTopBar
+import com.example.moneytalks.presentation.create_account.CreateAccountTopBar
 import com.example.moneytalks.presentation.create_transaction.CreateTransactionTopBar
 import com.example.moneytalks.presentation.earnings.EarningsTopBar
+import com.example.moneytalks.presentation.edit_account.EditAccountTopBar
 import com.example.moneytalks.presentation.history.HistoryTopBar
 import com.example.moneytalks.presentation.item_expenses.ItemExpenseTopBar
 import com.example.moneytalks.presentation.settings.SettingsTopBar
@@ -64,7 +60,11 @@ fun MainAppScreen() {
             "доходы_анализ" -> AnalysisTopBar
             else -> EarningsTopBar
         }
-        "счет_граф" -> AccountTopBar
+        "счет_граф" -> when (currentRoute) {
+            "счет_редактировать" -> EditAccountTopBar
+            "счет_добавить" -> CreateAccountTopBar
+            else -> AccountTopBar
+        }
         "статьи_граф" -> ItemExpenseTopBar
         "настройки_граф" -> SettingsTopBar
         else -> NoTopBar
@@ -113,7 +113,8 @@ fun MainAppScreen() {
         },
         floatingActionButton = {
             if (currentRoute == "расходы" ||
-                currentRoute == "доходы"
+                currentRoute == "доходы" ||
+                currentRoute == "счет"
             ) {
                 FloatingActionButton(
                     onClick = {
@@ -123,6 +124,9 @@ fun MainAppScreen() {
                             }
                             currentRoute.startsWith("доходы") == true -> {
                                 navController.navigate("доходы_добавить")
+                            }
+                            currentRoute.startsWith("счет") == true -> {
+                                navController.navigate("счет_добавить")
                             }
                         }
                     },
@@ -136,7 +140,7 @@ fun MainAppScreen() {
         },
         containerColor = Color(0xFFFef7ff)
     ) { padding ->
-        TabNavHost(
+        MainNavHost(
             navController = navController,
             modifier = Modifier.padding(padding)
         )

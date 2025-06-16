@@ -40,7 +40,7 @@ class CreateTransactionTopBar(val type: String) : AppBarProvider {
                 }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ok),
-                        contentDescription = "История"
+                        contentDescription = "Ок"
                     )
                 }
             }

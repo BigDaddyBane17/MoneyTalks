@@ -1,4 +1,4 @@
-package com.example.moneytalks.presentation.account
+package com.example.moneytalks.presentation.edit_account
 
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,7 +13,7 @@ import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.AppBarProvider
 
-object AccountTopBar : AppBarProvider {
+object EditAccountTopBar : AppBarProvider {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun provideTopBar(navController: NavHostController) {
@@ -24,13 +24,23 @@ object AccountTopBar : AppBarProvider {
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = Color(0xFF2AE881)
             ),
-            actions = {
+            navigationIcon = {
                 IconButton(onClick = {
-                    navController.navigate("счет_редактировать")
+                    navController.popBackStack()
                 }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.pen),
-                        contentDescription = "Редактирование"
+                        painter = painterResource(id = R.drawable.cancel),
+                        contentDescription = "Назад"
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = {
+
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ok),
+                        contentDescription = "Ок"
                     )
                 }
             }

@@ -15,4 +15,3 @@ val items = listOf(
     BottomNavigationItem("Настройки", R.drawable.settings),
 )
 
-val tabRoutes = listOf("расходы", "доходы", "счет", "статьи", "настройки")

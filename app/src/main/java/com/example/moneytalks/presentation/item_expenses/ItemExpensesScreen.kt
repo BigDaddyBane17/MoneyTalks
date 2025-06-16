@@ -39,8 +39,6 @@ fun ItemExpensesScreen(
         viewModel.handleIntent(ItemExpensesIntent.LoadItemExpenses)
     }
 
-
-
     when (uiState) {
         is ItemExpenseUiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
