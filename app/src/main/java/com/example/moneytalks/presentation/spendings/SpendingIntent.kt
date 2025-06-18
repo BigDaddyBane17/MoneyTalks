@@ -1,8 +1,8 @@
 package com.example.moneytalks.presentation.spendings
 
 sealed class SpendingIntent {
-    object LoadExpenses: SpendingIntent()
+    data class LoadExpenses(
+       val accountId: Int, val startDate: String, val endDate: String
+    ): SpendingIntent()
     object OnItemClicked: SpendingIntent()
-    object AddExpense: SpendingIntent()
-    object GoToHistory: SpendingIntent()
 }

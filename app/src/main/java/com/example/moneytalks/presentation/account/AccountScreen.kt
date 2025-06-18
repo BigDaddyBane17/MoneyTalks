@@ -40,6 +40,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.ListItem
+import com.example.moneytalks.presentation.common.TopAppBarState
+import com.example.moneytalks.presentation.common.TopAppBarStateProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +54,15 @@ fun AccountScreen(
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
 
+//    TopAppBarStateProvider.update(
+//        TopAppBarState(
+//            title = "Мой счет",
+//            trailingIcon = R.drawable.pen,
+//            onTrailingIconClick = {
+//                navController.navigate("счет_редактировать")
+//            }
+//        )
+//    )
 
     LaunchedEffect(Unit) {
         viewModel.handleIntent(AccountIntent.LoadAccountData)
@@ -138,6 +149,7 @@ fun AccountScreen(
 
         is AccountUiState.Success -> {
             val state = uiState as AccountUiState.Success
+
             Column {
                 ListItem(
                     title = "Баланс",

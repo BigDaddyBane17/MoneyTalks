@@ -23,6 +23,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.ListItem
+import com.example.moneytalks.presentation.common.TopAppBarState
+import com.example.moneytalks.presentation.common.TopAppBarStateProvider
 
 @Composable
 fun EarningsScreen(
@@ -34,6 +36,16 @@ fun EarningsScreen(
     LaunchedEffect(Unit) {
         viewModel.handleIntent(EarningsIntent.LoadEarnings)
     }
+
+//    TopAppBarStateProvider.update(
+//        TopAppBarState(
+//            title = "Доходы сегодня",
+//            trailingIcon = R.drawable.clocks,
+//            onTrailingIconClick = {
+//                navController.navigate("доходы_история")
+//            }
+//        )
+//    )
 
     Column {
         when (uiState) {
@@ -51,6 +63,7 @@ fun EarningsScreen(
                 val sum = state.items.sumOf { it.amount.replace(" ", "").toInt() }
                 val totalAmount = "%,d".format(sum)
                     .replace(",", " ") + " ₽"
+
 
                 ListItem(
                     title = "Всего",

@@ -23,6 +23,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.ListItem
+import com.example.moneytalks.presentation.common.TopAppBarState
+import com.example.moneytalks.presentation.common.TopAppBarStateProvider
 
 @Composable
 fun SettingsScreen(
@@ -34,6 +36,12 @@ fun SettingsScreen(
     LaunchedEffect(Unit) {
         viewModel.handleIntent(SettingsIntent.LoadSettings)
     }
+
+//    TopAppBarStateProvider.update(
+//        TopAppBarState(
+//            title = "Настройки"
+//        )
+//    )
 
     when (uiState) {
         is SettingsUiState.Loading -> {

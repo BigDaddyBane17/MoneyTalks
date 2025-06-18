@@ -13,31 +13,38 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.moneytalks.presentation.account.AccountTopBar
-import com.example.moneytalks.presentation.analysis.AnalysisTopBar
-import com.example.moneytalks.presentation.common.NoTopBar
-import com.example.moneytalks.presentation.create_account.CreateAccountTopBar
-import com.example.moneytalks.presentation.create_transaction.CreateTransactionTopBar
-import com.example.moneytalks.presentation.earnings.EarningsTopBar
-import com.example.moneytalks.presentation.edit_account.EditAccountTopBar
-import com.example.moneytalks.presentation.history.HistoryTopBar
-import com.example.moneytalks.presentation.item_expenses.ItemExpenseTopBar
-import com.example.moneytalks.presentation.settings.SettingsTopBar
-import com.example.moneytalks.presentation.spendings.SpendingTopBar
+import com.example.moneytalks.R
+import com.example.moneytalks.data.BaseRepositoryImpl
+import com.example.moneytalks.data.remote.RetrofitInstance
+import com.example.moneytalks.presentation.common.TopAppBarState
+import com.example.moneytalks.presentation.common.TopBar
+import com.example.moneytalks.presentation.create_transaction.CreateTransactionIntent
+import com.example.moneytalks.presentation.create_transaction.CreateTransactionViewModel
+import com.example.moneytalks.presentation.create_transaction.CreateTransactionViewModelFactory
+import com.example.moneytalks.presentation.spendings.SpendingIntent
+import com.example.moneytalks.presentation.spendings.SpendingViewModel
+import com.example.moneytalks.presentation.spendings.SpendingViewModelFactory
 
 @Composable
 fun MainAppScreen() {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
+
+
+    val repository = remember { BaseRepositoryImpl(RetrofitInstance.api) }
+    val createTransactionViewModel: CreateTransactionViewModel = viewModel(factory = CreateTransactionViewModelFactory(repository))
+
 
     val tabRoutes = listOf(
         "расходы_граф", "доходы_граф", "счет_граф", "статьи_граф", "настройки_граф"
@@ -47,32 +54,103 @@ fun MainAppScreen() {
         currentRoute?.startsWith(it.removeSuffix("_граф")) == true
     }.let { if (it == -1) 0 else it }
 
-    val topBarProvider = when (tabRoutes[selectedTab]) {
-        "расходы_граф" -> when (currentRoute) {
-            "расходы_история" -> HistoryTopBar("расходы")
-            "расходы_добавить" -> CreateTransactionTopBar("расходы")
-            "расходы_анализ" -> AnalysisTopBar
-            else -> SpendingTopBar
+
+    val topAppBarState = remember(currentBackStackEntry) {
+        when (currentBackStackEntry?.destination?.route) {
+            // Граф "Расходы"
+            "расходы" -> TopAppBarState(
+                title = "Расходы сегодня",
+                trailingIcon = R.drawable.clocks,
+                onTrailingIconClick = { navController.navigate("расходы_история") }
+            )
+            "расходы_история" -> TopAppBarState(
+                title = "Моя история",
+                leadingIcon = R.drawable.back,
+                trailingIcon = R.drawable.history,
+                onLeadingIconClick = { navController.popBackStack() },
+                onTrailingIconClick = { navController.navigate("расходы_анализ") }
+            )
+            "расходы_добавить" -> TopAppBarState(
+                title = "Мои расходы",
+                leadingIcon = R.drawable.back,
+                trailingIcon = R.drawable.ok,
+                onLeadingIconClick = { navController.popBackStack() },
+                onTrailingIconClick = {
+                    createTransactionViewModel.handleIntent(CreateTransactionIntent.SubmitTransaction)
+                }
+            )
+            "расходы_анализ" -> TopAppBarState(
+                title = "Анализ расходов",
+                leadingIcon = R.drawable.back,
+                onLeadingIconClick = { navController.popBackStack() }
+            )
+
+            // Граф "Доходы"
+            "доходы" -> TopAppBarState(
+                title = "Доходы сегодня",
+                trailingIcon = R.drawable.clocks,
+                onTrailingIconClick = { navController.navigate("доходы_история") }
+            )
+            "доходы_история" -> TopAppBarState(
+                title = "История доходов",
+                leadingIcon = R.drawable.back,
+                trailingIcon = R.drawable.history,
+                onLeadingIconClick = { navController.popBackStack() },
+                onTrailingIconClick = { navController.navigate("доходы_анализ") }
+            )
+            "доходы_добавить" -> TopAppBarState(
+                title = "Мои доходы",
+                leadingIcon = R.drawable.back,
+                onLeadingIconClick = { navController.popBackStack() }
+            )
+            "доходы_анализ" -> TopAppBarState(
+                title = "Анализ доходов",
+                leadingIcon = R.drawable.back,
+                onLeadingIconClick = { navController.popBackStack() }
+            )
+
+            // Граф "Счет"
+            "счет" -> TopAppBarState(
+                title = "Мои счета",
+                trailingIcon = R.drawable.pen,
+                onTrailingIconClick = { navController.navigate("счет_добавить") }
+            )
+            "счет_добавить" -> TopAppBarState(
+                title = "Мой счет",
+                leadingIcon = R.drawable.cancel,
+                onLeadingIconClick = { navController.popBackStack() },
+                trailingIcon = R.drawable.ok,
+                onTrailingIconClick = {
+
+                }
+            )
+            "счет_редактировать" -> TopAppBarState(
+                title = "Мой счет",
+                leadingIcon = R.drawable.cancel,
+                onLeadingIconClick = { navController.popBackStack() },
+                trailingIcon = R.drawable.ok,
+                onTrailingIconClick = {
+
+                }
+            )
+
+            // Граф "Статьи"
+            "статьи" -> TopAppBarState(
+                title = "Статьи расходов",
+            )
+
+            // Граф "Настройки"
+            "настройки" -> TopAppBarState(
+                title = "Настройки"
+            )
+
+            else -> TopAppBarState()
         }
-        "доходы_граф" -> when (currentRoute) {
-            "доходы_история" -> HistoryTopBar("доходы")
-            "доходы_добавить" -> CreateTransactionTopBar("доходы")
-            "доходы_анализ" -> AnalysisTopBar
-            else -> EarningsTopBar
-        }
-        "счет_граф" -> when (currentRoute) {
-            "счет_редактировать" -> EditAccountTopBar
-            "счет_добавить" -> CreateAccountTopBar
-            else -> AccountTopBar
-        }
-        "статьи_граф" -> ItemExpenseTopBar
-        "настройки_граф" -> SettingsTopBar
-        else -> NoTopBar
     }
 
     Scaffold(
         topBar = {
-            topBarProvider.provideTopBar(navController)
+            TopBar(state = topAppBarState)
         },
         bottomBar = {
             NavigationBar(containerColor = Color(0xFFF3EDF7)) {
@@ -120,6 +198,7 @@ fun MainAppScreen() {
                     onClick = {
                         when {
                             currentRoute.startsWith("расходы") == true -> {
+                                createTransactionViewModel.reset()
                                 navController.navigate("расходы_добавить")
                             }
                             currentRoute.startsWith("доходы") == true -> {
@@ -142,7 +221,8 @@ fun MainAppScreen() {
     ) { padding ->
         MainNavHost(
             navController = navController,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            createTransactionViewModel = createTransactionViewModel,
         )
     }
 }

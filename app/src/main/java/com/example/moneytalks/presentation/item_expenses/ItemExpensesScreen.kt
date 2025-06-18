@@ -23,8 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.ListItem
 import com.example.moneytalks.presentation.common.SearchBar
+import com.example.moneytalks.presentation.common.TopAppBarState
+import com.example.moneytalks.presentation.common.TopAppBarStateProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +42,12 @@ fun ItemExpensesScreen(
         viewModel.handleIntent(ItemExpensesIntent.LoadItemExpenses)
     }
 
+//    TopAppBarStateProvider.update(
+//        TopAppBarState(
+//            title = "Мои статьи"
+//        )
+//    )
+
     when (uiState) {
         is ItemExpenseUiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -48,6 +57,7 @@ fun ItemExpensesScreen(
 
         is ItemExpenseUiState.Success -> {
             val expenses = (uiState as ItemExpenseUiState.Success).items
+
 
             Column {
                 SearchBar(

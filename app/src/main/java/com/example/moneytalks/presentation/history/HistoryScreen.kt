@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,7 +20,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
+import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.ListItem
+import com.example.moneytalks.presentation.common.TopAppBarState
+import com.example.moneytalks.presentation.common.TopAppBarStateProvider
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -45,6 +49,20 @@ fun HistoryScreen(
 
 
     val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'г.'", Locale("ru"))
+
+//    TopAppBarStateProvider.update(
+//        TopAppBarState(
+//            title = "Моя история",
+//            leadingIcon = R.drawable.back,
+//            trailingIcon = R.drawable.history,
+//            onLeadingIconClick = {
+//                navController.popBackStack()
+//            },
+//            onTrailingIconClick = {
+//                navController.navigate("${type}_анализ")
+//            }
+//        )
+//    )
 
     Column {
         ListItem(

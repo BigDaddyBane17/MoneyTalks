@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.datetime)
+    implementation(libs.accompanist.systemuicontroller)
 
 
 }
