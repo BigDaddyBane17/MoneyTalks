@@ -3,7 +3,6 @@ package com.example.moneytalks.presentation.account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.moneytalks.domain.repository.BaseRepository
-import com.example.moneytalks.presentation.spendings.SpendingViewModel
 
 class AccountsViewModelFactory(
     val repository: BaseRepository

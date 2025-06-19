@@ -14,20 +14,6 @@ fun CreateAccount(
     modifier: Modifier = Modifier
 ) {
 
-//    TopAppBarStateProvider.update(
-//        TopAppBarState(
-//            title = "Мой счет",
-//            leadingIcon = R.drawable.cancel,
-//            trailingIcon = R.drawable.ok,
-//            onLeadingIconClick = {
-//                navController.popBackStack()
-//            },
-//            onTrailingIconClick = {
-//
-//            }
-//        )
-//    )
-
     Text(
         text = "Создать счет"
     )

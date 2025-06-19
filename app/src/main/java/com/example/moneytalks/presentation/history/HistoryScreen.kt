@@ -46,6 +46,7 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDate.now
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -115,7 +116,12 @@ fun HistoryScreen(
 
         when (val state = uiState) {
             is HistoryUiState.Loading -> {
-                Box(Modifier.fillMaxWidth().height(120.dp), contentAlignment = Alignment.Center) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator()
                 }
             }
@@ -128,23 +134,39 @@ fun HistoryScreen(
                     backgroundColor = Color(0xFFD4FAE6),
                 )
 
-                // Список транзакций
                 if (state.items.isEmpty()) {
-                    Text("Нет операций", modifier = Modifier.padding(16.dp), color = Color.Gray)
+                    Text(
+                        "Нет операций",
+                        modifier = Modifier.padding(16.dp),
+                        color = Color.Gray
+                    )
                 } else {
-                    state.items.forEach { tx ->
-                        ListItem(
-                            title = tx.category.name,
-                            leadingIcon = tx.category.emoji,
-                            trailingIcon = R.drawable.more_vert,
-                            amount = tx.amount,
-                            currency = "₽",
-                            description = tx.comment,
-                            modifier = Modifier,
-                            onClick = {}
-                        )
-                        HorizontalDivider()
-                    }
+                    val outputFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy, HH:mm", Locale("ru"))
+                    state.items
+                        .sortedBy {
+                            Instant.parse(it.createdAt)
+                        }
+                        .forEach { tx ->
+                            val formattedDate = try {
+                                val instant = Instant.parse(tx.createdAt)
+                                val dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime()
+                                dateTime.format(outputFormatter)
+                            } catch (e: Exception) {
+                                tx.createdAt
+                            }
+                            ListItem(
+                                title = tx.category.name,
+                                leadingIcon = tx.category.emoji,
+                                trailingIcon = R.drawable.more_vert,
+                                amount = tx.amount,
+                                currency = "₽",
+                                description = tx.comment,
+                                subtitle = formattedDate,
+                                modifier = Modifier,
+                                onClick = {}
+                            )
+                            HorizontalDivider()
+                        }
                 }
             }
             is HistoryUiState.Error -> {
@@ -154,6 +176,7 @@ fun HistoryScreen(
                 )
             }
         }
+
     }
 
     if (showDialog) {

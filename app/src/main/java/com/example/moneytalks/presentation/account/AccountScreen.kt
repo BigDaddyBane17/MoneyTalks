@@ -13,13 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -35,17 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
-import com.example.moneytalks.data.BaseRepositoryImpl
-import com.example.moneytalks.data.remote.RetrofitInstance
-import com.example.moneytalks.data.remote.model.Account
 import com.example.moneytalks.presentation.common.ListItem
-import com.example.moneytalks.presentation.common.TopAppBarState
-import com.example.moneytalks.presentation.common.TopAppBarStateProvider
-import com.example.moneytalks.presentation.spendings.SpendingViewModel
-import com.example.moneytalks.presentation.spendings.SpendingViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +42,6 @@ fun AccountScreen(
     navController: NavHostController,
     viewModel: AccountViewModel,
 ) {
-
 
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState()
@@ -63,11 +51,6 @@ fun AccountScreen(
     LaunchedEffect(Unit) {
         viewModel.handleIntent(AccountIntent.LoadAccountData)
 
-        viewModel.navigationEvent.collect { event ->
-            when (event) {
-                is AccountNavigationEvent.NavigateToBalance -> navController.navigate("счет_редактировать")
-            }
-        }
     }
 
     if (showSheet) {
@@ -154,7 +137,7 @@ fun AccountScreen(
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                     trailingIcon = R.drawable.more_vert,
                     onClick = {
-                        //viewModel.handleIntent(AccountIntent.BalanceClick)
+                        navController.navigate("счет_редактировать")
                     },
                     leadingIcon = "\uD83D\uDCB0",
                     modifier = Modifier.height(56.dp)

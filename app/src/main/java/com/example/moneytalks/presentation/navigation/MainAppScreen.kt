@@ -51,8 +51,6 @@ fun MainAppScreen() {
     val repository = remember { BaseRepositoryImpl(RetrofitInstance.api) }
 
     //вьюмодели для доходов расходов
-
-
     val spendingViewModel: CreateTransactionViewModel = viewModel(
         key = "spendings",
         factory = CreateTransactionViewModelFactory(repository, type = "расходы")
@@ -61,13 +59,12 @@ fun MainAppScreen() {
         key = "earnings",
         factory = CreateTransactionViewModelFactory(repository, type = "доходы")
     )
+
+    //вьюмодель для счетов
     val accountViewModel: AccountViewModel = viewModel(factory = AccountsViewModelFactory(repository))
 
 
-
     val accounts by accountViewModel.accounts.collectAsState()
-
-    //var selectedAccountId by remember { mutableStateOf<Int?>(null) }
     val selectedAccountId by accountViewModel.selectedAccountId.collectAsState()
 
     var showAccountMenu by remember { mutableStateOf(false) }
@@ -87,10 +84,6 @@ fun MainAppScreen() {
             "расходы" -> TopAppBarState(
                 title = "Расходы сегодня",
                 trailingIcon = R.drawable.clocks,
-                //leadingIcon = R.drawable.choose_account,
-                onLeadingIconClick = {
-                    //showAccountMenu = true
-                },
                 onTrailingIconClick = {
                     navController.navigate("расходы_история")
                 }
@@ -121,10 +114,6 @@ fun MainAppScreen() {
             "доходы" -> TopAppBarState(
                 title = "Доходы сегодня",
                 trailingIcon = R.drawable.clocks,
-                //leadingIcon = R.drawable.choose_account,
-                onLeadingIconClick = {
-                    //showAccountMenu = true
-                },
                 onTrailingIconClick = {
                     navController.navigate("доходы_история")
                 }
@@ -159,7 +148,7 @@ fun MainAppScreen() {
                     showAccountMenu = true
                 },
                 trailingIcon = R.drawable.pen,
-                onTrailingIconClick = { navController.navigate("счет_добавить") }
+                onTrailingIconClick = { navController.navigate("счет_редактировать") }
             )
             "счет_добавить" -> TopAppBarState(
                 title = "Мой счет",
@@ -208,15 +197,7 @@ fun MainAppScreen() {
                         DropdownMenuItem(
                             text = { Text(account.name) },
                             onClick = {
-                                accountViewModel.selectAccount(account.id)                                //accountViewModel.selectAccount(account.id)
-//                                when {
-//                                    currentRoute?.startsWith("расходы") == true -> {
-//                                        selectedSpendingAccountId = account.id
-//                                    }
-//                                    currentRoute?.startsWith("доходы") == true -> {
-//                                        selectedEarningAccountId = account.id
-//                                    }
-//                                }
+                                accountViewModel.selectAccount(account.id)
                                 showAccountMenu = false
                             }
                         )

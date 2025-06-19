@@ -21,7 +21,8 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,23 +36,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
-import com.example.moneytalks.data.BaseRepositoryImpl
-import com.example.moneytalks.data.remote.RetrofitInstance
 import com.example.moneytalks.presentation.common.ListItem
-import com.example.moneytalks.presentation.common.TopAppBarState
-import com.example.moneytalks.presentation.common.TopAppBarStateProvider
-import com.example.moneytalks.presentation.spendings.SpendingViewModel
-import com.example.moneytalks.presentation.spendings.SpendingViewModelFactory
 import java.time.Instant
 import java.time.ZoneId
 
@@ -62,7 +56,6 @@ fun CreateTransactionScreen(
     viewModel: CreateTransactionViewModel,
     type: String,
 ) {
-
 
 
     val uiState by viewModel.uiState.collectAsState()
@@ -88,23 +81,19 @@ fun CreateTransactionScreen(
         }
 
         is CreateTransactionUiState.Data -> {
-            Column(
-                Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-            ) {
-                // Счет
+            Column {
                 ExposedDropdownMenuBox(
                     expanded = showAccountMenu,
                     onExpandedChange = { showAccountMenu = !showAccountMenu }
                 ) {
                     ListItem(
-                        modifier = Modifier.menuAnchor(),
+                        modifier = Modifier.menuAnchor((MenuAnchorType.PrimaryEditable)),
                         title = "Счет",
                         amount = viewModel.selectedAccount?.name ?: "Выберите счет",
                         trailingIcon = R.drawable.more_vert,
                         onClick = { showAccountMenu = true }
                     )
+                    HorizontalDivider()
                     ExposedDropdownMenu(
                         expanded = showAccountMenu,
                         onDismissRequest = { showAccountMenu = false }
@@ -121,15 +110,14 @@ fun CreateTransactionScreen(
                     }
                 }
 
-                Spacer(Modifier.height(12.dp))
+                HorizontalDivider()
 
-                // Статья
                 ExposedDropdownMenuBox(
                     expanded = showCategoryMenu,
                     onExpandedChange = { showCategoryMenu = !showCategoryMenu }
                 ) {
                     ListItem(
-                        modifier = Modifier.menuAnchor(),
+                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
                         title = "Статья",
                         amount = viewModel.selectedCategory?.name ?: "Выберите статью",
                         trailingIcon = R.drawable.more_vert,
@@ -151,9 +139,7 @@ fun CreateTransactionScreen(
                     }
                 }
 
-                Spacer(Modifier.height(12.dp))
-
-                // Сумма
+                HorizontalDivider()
                 ListItem(
                     modifier = Modifier,
                     title = "Сумма",
@@ -190,9 +176,7 @@ fun CreateTransactionScreen(
                     )
                 }
 
-                Spacer(Modifier.height(12.dp))
-
-                // Дата
+                HorizontalDivider()
                 ListItem(
                     modifier = Modifier,
                     title = "Дата",
@@ -220,9 +204,7 @@ fun CreateTransactionScreen(
                     ) { DatePicker(state = datePickerState) }
                 }
 
-                Spacer(Modifier.height(12.dp))
-
-                // Время
+                HorizontalDivider()
                 ListItem(
                     modifier = Modifier,
                     title = "Время",
@@ -257,9 +239,7 @@ fun CreateTransactionScreen(
                     }
                 }
 
-                Spacer(Modifier.height(12.dp))
-
-                // Комментарий
+                HorizontalDivider()
                 ListItem(
                     modifier = Modifier,
                     title = "Комментарий",
@@ -270,6 +250,7 @@ fun CreateTransactionScreen(
                         showCommentDialog = true
                     }
                 )
+                HorizontalDivider()
                 if (showCommentDialog) {
                     AlertDialog(
                         onDismissRequest = { showCommentDialog = false },

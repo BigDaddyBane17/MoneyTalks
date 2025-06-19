@@ -3,8 +3,6 @@ package com.example.moneytalks.presentation.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.domain.repository.BaseRepository
-import com.example.moneytalks.presentation.spendings.SpendingUiState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

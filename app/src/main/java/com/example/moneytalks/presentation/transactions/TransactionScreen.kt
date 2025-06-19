@@ -1,4 +1,4 @@
-package com.example.moneytalks.presentation.spendings
+package com.example.moneytalks.presentation.transactions
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,8 +38,8 @@ fun SpendingScreen(
 ) {
 
     val repository = remember { BaseRepositoryImpl(RetrofitInstance.api) }
-    val viewModel: SpendingViewModel = viewModel(
-        factory = SpendingViewModelFactory(repository, type)
+    val viewModel: TransactionViewModel = viewModel(
+        factory = TransactionViewModelFactory(repository, type)
     )
 
     val uiState by viewModel.uiState.collectAsState()
@@ -47,20 +47,20 @@ fun SpendingScreen(
 
     LaunchedEffect(accountId) {
         if(accountId != null) {
-            viewModel.handleIntent(SpendingIntent.LoadExpenses(accountId = accountId, startDate = "2025-06-18", endDate = "2025-06-19"))
+            viewModel.handleIntent(TransactionIntent.LoadExpenses(accountId = accountId, startDate = "2025-06-18", endDate = "2025-06-19"))
         }
 
     }
 
     when (uiState) {
-        is SpendingUiState.Loading -> {
+        is TransactionUiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
 
-        is SpendingUiState.Success -> {
-            val state = uiState as SpendingUiState.Success
+        is TransactionUiState.Success -> {
+            val state = uiState as TransactionUiState.Success
 
             Column {
                 ListItem(
@@ -81,7 +81,7 @@ fun SpendingScreen(
                             description = item.comment,
                             trailingIcon = R.drawable.more_vert,
                             onClick = {
-                                viewModel.handleIntent(SpendingIntent.OnItemClicked)
+                                viewModel.handleIntent(TransactionIntent.OnItemClicked)
                             },
                             contentPadding = if (item.comment != null)
                                 PaddingValues(vertical = 16.dp, horizontal = 16.dp)
@@ -95,9 +95,9 @@ fun SpendingScreen(
             }
         }
 
-        is SpendingUiState.Error -> {
+        is TransactionUiState.Error -> {
             Text(
-                text = (uiState as SpendingUiState.Error).message,
+                text = (uiState as TransactionUiState.Error).message,
                 color = Color.Red,
                 modifier = Modifier.padding(16.dp)
             )

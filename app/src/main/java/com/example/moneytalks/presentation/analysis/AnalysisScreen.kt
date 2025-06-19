@@ -13,16 +13,6 @@ fun AnalysisScreen(
     type: String
 ) {
 
-//    TopAppBarStateProvider.update(
-//        TopAppBarState(
-//            title = "Анализ",
-//            leadingIcon = R.drawable.cancel,
-//            onLeadingIconClick = {
-//                navController.popBackStack()
-//            },
-//        )
-//    )
-
     Text(
         "АНАЛИЗ $type"
     )

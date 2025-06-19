@@ -42,11 +42,6 @@ fun ItemExpensesScreen(
         viewModel.handleIntent(ItemExpensesIntent.LoadItemExpenses)
     }
 
-//    TopAppBarStateProvider.update(
-//        TopAppBarState(
-//            title = "Мои статьи"
-//        )
-//    )
 
     when (uiState) {
         is ItemExpenseUiState.Loading -> {
