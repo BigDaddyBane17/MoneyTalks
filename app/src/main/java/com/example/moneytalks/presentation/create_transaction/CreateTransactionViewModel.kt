@@ -17,14 +17,18 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class CreateTransactionViewModel(
-    private val repository: BaseRepository
+    private val repository: BaseRepository,
+    private val type: String
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CreateTransactionUiState>(CreateTransactionUiState.Loading)
     val uiState: StateFlow<CreateTransactionUiState> = _uiState.asStateFlow()
 
-    var accounts: List<Account> = emptyList()
-    var categories: List<Category> = emptyList()
+    private val _accounts = MutableStateFlow<List<Account>>(emptyList())
+    val accounts: StateFlow<List<Account>> = _accounts.asStateFlow()
+
+    private val _categories = MutableStateFlow<List<Category>>(emptyList())
+    val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
     var selectedAccount: Account? = null
     var selectedCategory: Category? = null
@@ -40,25 +44,25 @@ class CreateTransactionViewModel(
     private fun loadInitialData() {
         viewModelScope.launch {
             try {
-                accounts = repository.getAccounts()
-                categories = repository.getCategoriesByType(isIncome = false)
-                _uiState.value = CreateTransactionUiState.Data(accounts, categories)
-                Log.d("CreateTransactionVM", "Accounts: $accounts")
-                Log.d("CreateTransactionVM", "Categories: $categories")
-
+                val loadedAccounts = repository.getAccounts()
+                val loadedCategories = repository.getCategoriesByType(isIncome = (type == "доходы"))
+                _accounts.value = loadedAccounts
+                _categories.value = loadedCategories
+                _uiState.value = CreateTransactionUiState.Data(loadedAccounts, loadedCategories)
             } catch (e: Exception) {
                 _uiState.value = CreateTransactionUiState.Error("Ошибка загрузки: ${e.localizedMessage}")
             }
         }
     }
 
+
     fun handleIntent(intent: CreateTransactionIntent) {
         when (intent) {
             is CreateTransactionIntent.SetAccount -> {
-                selectedAccount = accounts.firstOrNull { it.id == intent.id }
+                selectedAccount = _accounts.value.firstOrNull { it.id == intent.id }
             }
             is CreateTransactionIntent.SetCategory -> {
-                selectedCategory = categories.firstOrNull { it.id == intent.id }
+                selectedCategory = _categories.value.firstOrNull { it.id == intent.id }
             }
             is CreateTransactionIntent.SetAmount -> {
                 amount = intent.amount
@@ -115,7 +119,7 @@ class CreateTransactionViewModel(
                     transactionDate = isoDateTime,
                     comment = commentToSend
                 )
-                Log.d("taga", request.toString())
+                Log.d("taaag", request.toString())
                 repository.createTransaction(request)
                 _uiState.value = CreateTransactionUiState.Success
             } catch (e: Exception) {

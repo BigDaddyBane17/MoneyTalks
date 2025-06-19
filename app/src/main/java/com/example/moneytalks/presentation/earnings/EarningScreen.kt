@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,15 +23,27 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
+import com.example.moneytalks.data.BaseRepositoryImpl
+import com.example.moneytalks.data.remote.RetrofitInstance
 import com.example.moneytalks.presentation.common.ListItem
 import com.example.moneytalks.presentation.common.TopAppBarState
 import com.example.moneytalks.presentation.common.TopAppBarStateProvider
+import com.example.moneytalks.presentation.spendings.SpendingViewModel
+import com.example.moneytalks.presentation.spendings.SpendingViewModelFactory
 
 @Composable
 fun EarningsScreen(
-    viewModel: EarningsViewModel = viewModel(),
-    navController: NavHostController
+    navController: NavHostController,
+    selectedId: Int?
 ) {
+
+
+    val repository = remember { BaseRepositoryImpl(RetrofitInstance.api) }
+    val viewModel: EarningsViewModel = viewModel(
+        factory = EarningsViewModelFactory(repository)
+    )
+
+
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {

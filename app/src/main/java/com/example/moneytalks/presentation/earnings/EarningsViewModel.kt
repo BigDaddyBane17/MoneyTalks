@@ -3,19 +3,22 @@ package com.example.moneytalks.presentation.earnings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.domain.model.Income
+import com.example.moneytalks.domain.repository.BaseRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class EarningsViewModel : ViewModel() {
+class EarningsViewModel(
+    private val repository: BaseRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow<EarningsUiState>(EarningsUiState.Loading)
     val uiState: StateFlow<EarningsUiState> = _uiState.asStateFlow()
 
     fun handleIntent(intent: EarningsIntent) {
         when (intent) {
-            EarningsIntent.LoadEarnings -> loadEarnings()
+            EarningsIntent.LoadEarnings -> loadData()
             EarningsIntent.OnItemClicked -> handleItemClick()
             EarningsIntent.AddEarning -> addEarning()
             EarningsIntent.GoToHistory -> goToHistory()
@@ -35,7 +38,7 @@ class EarningsViewModel : ViewModel() {
 
     }
 
-    private fun loadEarnings() {
+    private fun loadData() {
         _uiState.value = EarningsUiState.Loading
         viewModelScope.launch {
             delay(300)

@@ -60,7 +60,7 @@ interface ApiService {
     ): TransactionResponse
 
     @DELETE("transactions/{id}")
-    suspend fun deleteTransaction(@Path("id") id: Int): Unit
+    suspend fun deleteTransaction(@Path("id") id: Int)
 
     @GET("transactions/account/{accountId}/period")
     suspend fun getTransactionsByPeriod(

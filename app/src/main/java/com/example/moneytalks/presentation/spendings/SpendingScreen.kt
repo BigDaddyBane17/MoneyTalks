@@ -1,6 +1,5 @@
 package com.example.moneytalks.presentation.spendings
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,55 +8,48 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.moneytalks.R
-import com.example.moneytalks.presentation.common.ListItem
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavController
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.moneytalks.R
 import com.example.moneytalks.data.BaseRepositoryImpl
 import com.example.moneytalks.data.remote.RetrofitInstance
-import com.example.moneytalks.presentation.common.TopAppBarState
-import com.example.moneytalks.presentation.common.TopAppBarStateProvider
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-
+import com.example.moneytalks.presentation.common.ListItem
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpendingScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    accountId: Int?,
+    type: String
 ) {
 
     val repository = remember { BaseRepositoryImpl(RetrofitInstance.api) }
     val viewModel: SpendingViewModel = viewModel(
-        factory = SpendingViewModelFactory(repository)
+        factory = SpendingViewModelFactory(repository, type)
     )
 
     val uiState by viewModel.uiState.collectAsState()
 
 
-    LaunchedEffect(Unit) {
-        viewModel.handleIntent(SpendingIntent.LoadExpenses(accountId = 220, startDate = "2025-06-17", endDate = "2025-06-18"))
+    LaunchedEffect(accountId) {
+        if(accountId != null) {
+            viewModel.handleIntent(SpendingIntent.LoadExpenses(accountId = accountId, startDate = "2025-06-18", endDate = "2025-06-19"))
+        }
+
     }
 
     when (uiState) {

@@ -3,17 +3,22 @@ package com.example.moneytalks.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.moneytalks.data.BaseRepositoryImpl
+import com.example.moneytalks.data.remote.RetrofitInstance
 import com.example.moneytalks.presentation.account.AccountScreen
+import com.example.moneytalks.presentation.account.AccountViewModel
 import com.example.moneytalks.presentation.analysis.AnalysisScreen
 import com.example.moneytalks.presentation.create_account.CreateAccount
 import com.example.moneytalks.presentation.create_transaction.CreateTransactionIntent
 
 import com.example.moneytalks.presentation.create_transaction.CreateTransactionScreen
 import com.example.moneytalks.presentation.create_transaction.CreateTransactionViewModel
+import com.example.moneytalks.presentation.create_transaction.CreateTransactionViewModelFactory
 import com.example.moneytalks.presentation.earnings.EarningsScreen
 import com.example.moneytalks.presentation.edit_account.EditAccountScreen
 import com.example.moneytalks.presentation.item_expenses.ItemExpensesScreen
@@ -26,7 +31,10 @@ fun MainNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: String = "расходы_граф",
-    createTransactionViewModel: CreateTransactionViewModel
+    selectedAccountId: Int?,
+    spendingViewModel: CreateTransactionViewModel,
+    earningViewModel: CreateTransactionViewModel,
+    accountViewModel: AccountViewModel
 ) {
     NavHost(
         navController = navController,
@@ -36,34 +44,57 @@ fun MainNavHost(
         // Граф "Расходы"
         navigation(startDestination = "расходы", route = "расходы_граф") {
             composable("расходы") { SpendingScreen(
-                navController = navController
+                navController = navController,
+                accountId = selectedAccountId,
+                type = "расходы"
             ) }
-            composable("расходы_история") { HistoryScreen(navController = navController, type = "расходы") }
+            composable("расходы_история") {
+                HistoryScreen(
+                    navController = navController,
+                    type = "расходы",
+                    accountId = selectedAccountId
+                )
+            }
             composable("расходы_добавить") {
                 CreateTransactionScreen(
                     navController = navController,
                     type = "расходы",
-                    viewModel = createTransactionViewModel
+                    viewModel = spendingViewModel
                 )
             }
             composable("расходы_анализ") { AnalysisScreen(navController = navController, type = "расходы") }
         }
         // Граф "Доходы"
         navigation(startDestination = "доходы", route = "доходы_граф") {
-            composable("доходы") { EarningsScreen(navController = navController) }
-            composable("доходы_история") { HistoryScreen(navController = navController, type = "доходы") }
+            composable("доходы") { SpendingScreen(
+                navController = navController,
+                accountId = selectedAccountId,
+                type = "доходы"
+            ) }
+            composable("доходы_история") {
+                HistoryScreen(
+                    navController = navController,
+                    type = "доходы",
+                    accountId = selectedAccountId
+                )
+            }
             composable("доходы_добавить") {
                 CreateTransactionScreen(
                     navController = navController,
                     type = "доходы",
-                    viewModel = createTransactionViewModel
+                    viewModel = earningViewModel
                 )
             }
             composable("доходы_анализ") { AnalysisScreen(navController = navController, type = "доходы") }
         }
         // Граф "Счет"
         navigation(startDestination = "счет", route = "счет_граф") {
-            composable("счет") { AccountScreen(navController = navController) }
+            composable("счет") {
+                AccountScreen(
+                    navController = navController,
+                    viewModel = accountViewModel
+                )
+            }
             composable("счет_добавить") { CreateAccount(navController = navController) }
             composable("счет_редактировать") { EditAccountScreen(navController = navController) }
         }

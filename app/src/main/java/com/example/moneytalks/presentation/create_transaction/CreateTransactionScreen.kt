@@ -50,6 +50,8 @@ import com.example.moneytalks.data.remote.RetrofitInstance
 import com.example.moneytalks.presentation.common.ListItem
 import com.example.moneytalks.presentation.common.TopAppBarState
 import com.example.moneytalks.presentation.common.TopAppBarStateProvider
+import com.example.moneytalks.presentation.spendings.SpendingViewModel
+import com.example.moneytalks.presentation.spendings.SpendingViewModelFactory
 import java.time.Instant
 import java.time.ZoneId
 
@@ -57,9 +59,12 @@ import java.time.ZoneId
 @Composable
 fun CreateTransactionScreen(
     navController: NavHostController,
+    viewModel: CreateTransactionViewModel,
     type: String,
-    viewModel: CreateTransactionViewModel
 ) {
+
+
+
     val uiState by viewModel.uiState.collectAsState()
 
     var showAccountMenu by remember { mutableStateOf(false) }
@@ -156,7 +161,7 @@ fun CreateTransactionScreen(
                     currency = "₽",
                     trailingIcon = R.drawable.more_vert,
                     onClick = {
-                        amountText = viewModel.amount // синхронизируем перед открытием
+                        amountText = viewModel.amount
                         showAmountDialog = true
                     }
                 )
@@ -258,10 +263,10 @@ fun CreateTransactionScreen(
                 ListItem(
                     modifier = Modifier,
                     title = "Комментарий",
-                    amount = viewModel.comment.ifBlank { "Добавить комментарий" },
+                    amount = viewModel.comment.ifBlank { "Комментарий" },
                     trailingIcon = R.drawable.more_vert,
                     onClick = {
-                        commentText = viewModel.comment // синхронизируем перед открытием
+                        commentText = viewModel.comment
                         showCommentDialog = true
                     }
                 )

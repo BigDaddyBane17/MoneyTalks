@@ -21,7 +21,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -39,30 +38,27 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
+import com.example.moneytalks.data.BaseRepositoryImpl
+import com.example.moneytalks.data.remote.RetrofitInstance
+import com.example.moneytalks.data.remote.model.Account
 import com.example.moneytalks.presentation.common.ListItem
 import com.example.moneytalks.presentation.common.TopAppBarState
 import com.example.moneytalks.presentation.common.TopAppBarStateProvider
+import com.example.moneytalks.presentation.spendings.SpendingViewModel
+import com.example.moneytalks.presentation.spendings.SpendingViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
-    viewModel: AccountViewModel = viewModel(),
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: AccountViewModel,
 ) {
+
 
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
 
-//    TopAppBarStateProvider.update(
-//        TopAppBarState(
-//            title = "Мой счет",
-//            trailingIcon = R.drawable.pen,
-//            onTrailingIconClick = {
-//                navController.navigate("счет_редактировать")
-//            }
-//        )
-//    )
 
     LaunchedEffect(Unit) {
         viewModel.handleIntent(AccountIntent.LoadAccountData)
@@ -153,12 +149,12 @@ fun AccountScreen(
             Column {
                 ListItem(
                     title = "Баланс",
-                    amount = state.account.amount,
+                    amount = state.account?.balance,
                     backgroundColor = Color(0xFFD4FAE6),
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                     trailingIcon = R.drawable.more_vert,
                     onClick = {
-                        viewModel.handleIntent(AccountIntent.BalanceClick)
+                        //viewModel.handleIntent(AccountIntent.BalanceClick)
                     },
                     leadingIcon = "\uD83D\uDCB0",
                     modifier = Modifier.height(56.dp)
@@ -166,7 +162,7 @@ fun AccountScreen(
                 HorizontalDivider()
                 ListItem(
                     title = "Валюта",
-                    amount = state.account.currency,
+                    amount = state.account?.currency,
                     backgroundColor = Color(0xFFD4FAE6),
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                     trailingIcon = R.drawable.more_vert,

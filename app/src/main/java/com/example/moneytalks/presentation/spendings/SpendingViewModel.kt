@@ -12,7 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SpendingViewModel(
-    private val repository: BaseRepository
+    private val repository: BaseRepository,
+    private val type: String,
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow<SpendingUiState>(SpendingUiState.Loading)
@@ -20,10 +21,12 @@ class SpendingViewModel(
 
     fun handleIntent(intent: SpendingIntent) {
         when (intent) {
-            is SpendingIntent.LoadExpenses -> loadData(intent.accountId, intent.startDate, intent.endDate)
+            is SpendingIntent.LoadExpenses -> loadData(intent.accountId ?: 1, intent.startDate, intent.endDate)
             is SpendingIntent.OnItemClicked -> handleItemClick()
         }
     }
+
+
 
     fun loadData(accountId: Int, startDate: String, endDate: String) {
         viewModelScope.launch {
@@ -32,7 +35,8 @@ class SpendingViewModel(
                 val spendingList = repository.getTransactionsByPeriod(
                     accountId, startDate, endDate
                 ).filter {
-                    !it.category.isIncome
+                    /*!it.category.isIncome*/
+                    if (type == "расходы") !it.category.isIncome else it.category.isIncome
                 } // сделать маппер тут
                 val total = spendingList.sumOf { it.amount.toDouble() }
 

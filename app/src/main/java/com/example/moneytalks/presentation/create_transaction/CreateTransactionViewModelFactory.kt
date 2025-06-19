@@ -6,11 +6,12 @@ import com.example.moneytalks.domain.repository.BaseRepository
 
 
 class CreateTransactionViewModelFactory(
-    private val repository: BaseRepository
+    private val repository: BaseRepository,
+    private val type: String
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CreateTransactionViewModel::class.java)) {
-            return CreateTransactionViewModel(repository) as T
+            return CreateTransactionViewModel(repository, type) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
