@@ -22,13 +22,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.example.moneytalks.R
 import com.example.moneytalks.presentation.common.ListItem
 import com.example.moneytalks.presentation.common.SearchBar
+import com.example.moneytalks.presentation.common.TopAppBarState
+import com.example.moneytalks.presentation.common.TopAppBarStateProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemExpensesScreen(
-    viewModel: ItemExpensesViewModel = viewModel()
+    viewModel: ItemExpensesViewModel = viewModel(),
+    navController: NavHostController
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -36,7 +41,6 @@ fun ItemExpensesScreen(
     LaunchedEffect(Unit) {
         viewModel.handleIntent(ItemExpensesIntent.LoadItemExpenses)
     }
-
 
 
     when (uiState) {
@@ -48,6 +52,7 @@ fun ItemExpensesScreen(
 
         is ItemExpenseUiState.Success -> {
             val expenses = (uiState as ItemExpenseUiState.Success).items
+
 
             Column {
                 SearchBar(

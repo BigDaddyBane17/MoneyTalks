@@ -22,6 +22,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.moneytalks.ui.theme.MoneyTalksTheme
 
 
+
 class SplashActivity: ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
