@@ -1,11 +1,11 @@
 package com.example.moneytalks.presentation.history
 
-import com.example.moneytalks.data.remote.model.TransactionResponse
+import com.example.moneytalks.data.remote.model.TransactionResponseDto
 
 sealed class HistoryUiState {
     object Loading: HistoryUiState()
     data class Success(
-        val items: List<TransactionResponse>,
+        val items: List<TransactionResponseDto>,
         val total: String
     ): HistoryUiState()
     data class Error(val message: String): HistoryUiState()

@@ -53,8 +53,7 @@ import java.time.ZoneId
 @Composable
 fun CreateTransactionScreen(
     navController: NavHostController,
-    viewModel: CreateTransactionViewModel,
-    type: String,
+    viewModel: CreateTransactionViewModel
 ) {
 
 

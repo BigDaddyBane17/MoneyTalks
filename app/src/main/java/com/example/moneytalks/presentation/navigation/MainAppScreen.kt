@@ -79,12 +79,12 @@ fun MainAppScreen() {
     )
 
     val transactionSpendingViewModel: TransactionViewModel = viewModel(
-        key = "spendings",
-        factory = TransactionViewModelFactory(repository, "расходы", networkMonitor)
+        key = "create_spendings",
+        factory = TransactionViewModelFactory(repository, networkMonitor)
     )
     val transactionEarningViewModel: TransactionViewModel = viewModel(
-        key = "spendings",
-        factory = TransactionViewModelFactory(repository, "доходы", networkMonitor)
+        key = "create_earnings",
+        factory = TransactionViewModelFactory(repository, networkMonitor)
     )
 
     //вьюмодель для счетов

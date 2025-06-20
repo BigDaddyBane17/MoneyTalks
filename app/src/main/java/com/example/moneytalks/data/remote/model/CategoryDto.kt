@@ -1,6 +1,6 @@
 package com.example.moneytalks.data.remote.model
 
-data class Category(
+data class CategoryDto(
     val id: Int,
     val name: String,
     val emoji: String,

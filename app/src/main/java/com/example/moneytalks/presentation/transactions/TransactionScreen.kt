@@ -16,30 +16,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
-import com.example.moneytalks.data.BaseRepositoryImpl
-import com.example.moneytalks.data.remote.RetrofitInstance
-import com.example.moneytalks.network.NetworkMonitor
 import com.example.moneytalks.presentation.common.ListItem
 import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SpendingScreen(
+fun TransactionScreen(
     navController: NavHostController,
     accountId: Int?,
+    type: String,
     viewModel: TransactionViewModel
 ) {
 
-
+    val isIncome = type == "доходы"
     val uiState by viewModel.uiState.collectAsState()
 
 
@@ -47,8 +43,8 @@ fun SpendingScreen(
         viewModel.handleIntent(TransactionIntent.LoadExpenses(
             accountId = accountId,
             startDate = LocalDate.now().toString(),
-            endDate = LocalDate.now().toString()
-        )
+            endDate = LocalDate.now().toString()),
+            isIncome = isIncome
         )
     }
 
@@ -91,7 +87,7 @@ fun SpendingScreen(
                             description = item.comment,
                             trailingIcon = R.drawable.more_vert,
                             onClick = {
-                                viewModel.handleIntent(TransactionIntent.OnItemClicked)
+                                viewModel.handleIntent(TransactionIntent.OnItemClicked, isIncome)
                             },
                             contentPadding = if (item.comment != null)
                                 PaddingValues(vertical = 16.dp, horizontal = 16.dp)

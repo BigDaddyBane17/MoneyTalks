@@ -17,8 +17,8 @@ import com.example.moneytalks.presentation.create_transaction.CreateTransactionV
 import com.example.moneytalks.presentation.edit_account.EditAccountScreen
 import com.example.moneytalks.presentation.item_expenses.ItemExpensesScreen
 import com.example.moneytalks.presentation.settings.SettingsScreen
-import com.example.moneytalks.presentation.transactions.SpendingScreen
 import com.example.moneytalks.presentation.history.HistoryScreen
+import com.example.moneytalks.presentation.transactions.TransactionScreen
 import com.example.moneytalks.presentation.transactions.TransactionViewModel
 
 @Composable
@@ -41,10 +41,11 @@ fun MainNavHost(
     ) {
         // Граф "Расходы"
         navigation(startDestination = "расходы", route = "расходы_граф") {
-            composable("расходы") { SpendingScreen(
+            composable("расходы") { TransactionScreen(
                 navController = navController,
                 accountId = selectedAccountId,
-                viewModel = transactionSpendingViewModel
+                viewModel = transactionSpendingViewModel,
+                type = "расходы"
             ) }
             composable("расходы_история") {
                 HistoryScreen(
@@ -57,18 +58,20 @@ fun MainNavHost(
             composable("расходы_добавить") {
                 CreateTransactionScreen(
                     navController = navController,
-                    type = "расходы",
                     viewModel = spendingViewModel
                 )
             }
             composable("расходы_анализ") { AnalysisScreen(navController = navController, type = "расходы") }
         }
+
+
         // Граф "Доходы"
         navigation(startDestination = "доходы", route = "доходы_граф") {
-            composable("доходы") { SpendingScreen(
+            composable("доходы") { TransactionScreen(
                 navController = navController,
                 accountId = selectedAccountId,
-                viewModel = transactionEarningViewModel
+                viewModel = transactionEarningViewModel,
+                type = "доходы"
             ) }
             composable("доходы_история") {
                 HistoryScreen(
@@ -81,12 +84,13 @@ fun MainNavHost(
             composable("доходы_добавить") {
                 CreateTransactionScreen(
                     navController = navController,
-                    type = "доходы",
                     viewModel = earningViewModel
                 )
             }
             composable("доходы_анализ") { AnalysisScreen(navController = navController, type = "доходы") }
         }
+
+
         // Граф "Счет"
         navigation(startDestination = "счет", route = "счет_граф") {
             composable("счет") {
@@ -98,10 +102,14 @@ fun MainNavHost(
             composable("счет_добавить") { CreateAccount(navController = navController) }
             composable("счет_редактировать") { EditAccountScreen(navController = navController) }
         }
+
+
         // Граф "Статьи"
         navigation(startDestination = "статьи", route = "статьи_граф") {
             composable("статьи") { ItemExpensesScreen(navController = navController) }
         }
+
+
         // Граф "Настройки"
         navigation(startDestination = "настройки", route = "настройки_граф") {
             composable("настройки") { SettingsScreen(navController = navController) }

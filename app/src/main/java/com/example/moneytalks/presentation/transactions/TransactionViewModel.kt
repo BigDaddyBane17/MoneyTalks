@@ -14,7 +14,6 @@ import java.io.IOException
 
 class TransactionViewModel(
     private val repository: BaseRepository,
-    private val type: String,
     private val networkMonitor: NetworkMonitor
 ): ViewModel() {
 
@@ -22,14 +21,14 @@ class TransactionViewModel(
     private val _uiState = MutableStateFlow<TransactionUiState>(TransactionUiState.Loading)
     val uiState: StateFlow<TransactionUiState> = _uiState.asStateFlow()
 
-    fun handleIntent(intent: TransactionIntent) {
+    fun handleIntent(intent: TransactionIntent, isIncome: Boolean) {
         when (intent) {
-            is TransactionIntent.LoadExpenses -> loadData(intent.accountId ?: 1, intent.startDate, intent.endDate)
+            is TransactionIntent.LoadExpenses -> loadData(intent.accountId ?: 1, intent.startDate, intent.endDate, isIncome)
             is TransactionIntent.OnItemClicked -> handleItemClick()
         }
     }
 
-    fun loadData(accountId: Int, startDate: String, endDate: String) {
+    fun loadData(accountId: Int, startDate: String, endDate: String, isIncome: Boolean) {
         viewModelScope.launch {
             if (!networkMonitor.isConnected.value) {
                 _uiState.value = TransactionUiState.Error("Нет соединения с интернетом")
@@ -41,13 +40,13 @@ class TransactionViewModel(
                     repository.getTransactionsByPeriod(
                         accountId, startDate, endDate
                     ).filter {
-                        if (type == "расходы") !it.category.isIncome else it.category.isIncome
+                        it.category.isIncome == isIncome
                     }
                 }
                 val total = spendingList.sumOf { it.amount.toDouble() }
                 _uiState.value = TransactionUiState.Success(spendingList, "$total")
             } catch (e: IOException) {
-                _uiState.value = TransactionUiState.Error("Нет соединения с интернетом. Проверьте сеть и повторите попытку.")
+                _uiState.value = TransactionUiState.Error("Нет соединения с интернетом.")
             } catch (e: HttpException) {
                 val code = e.code()
                 val errorBody = e.response()?.errorBody()?.string()

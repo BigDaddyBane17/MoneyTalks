@@ -1,16 +1,14 @@
 package com.example.moneytalks.presentation.create_transaction
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.moneytalks.data.remote.model.Account
-import com.example.moneytalks.data.remote.model.Category
-import com.example.moneytalks.data.remote.model.TransactionRequest
+import com.example.moneytalks.data.remote.model.AccountDto
+import com.example.moneytalks.data.remote.model.CategoryDto
+import com.example.moneytalks.data.remote.model.TransactionRequestDto
 import com.example.moneytalks.domain.repository.BaseRepository
 import com.example.moneytalks.network.NetworkMonitor
+import com.example.moneytalks.network.retryIO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,14 +25,14 @@ class CreateTransactionViewModel(
     private val _uiState = MutableStateFlow<CreateTransactionUiState>(CreateTransactionUiState.Loading)
     val uiState: StateFlow<CreateTransactionUiState> = _uiState.asStateFlow()
 
-    private val _accounts = MutableStateFlow<List<Account>>(emptyList())
-    val accounts: StateFlow<List<Account>> = _accounts.asStateFlow()
+    private val _accounts = MutableStateFlow<List<AccountDto>>(emptyList())
+    val accounts: StateFlow<List<AccountDto>> = _accounts.asStateFlow()
 
-    private val _categories = MutableStateFlow<List<Category>>(emptyList())
-    val categories: StateFlow<List<Category>> = _categories.asStateFlow()
+    private val _categories = MutableStateFlow<List<CategoryDto>>(emptyList())
+    val categories: StateFlow<List<CategoryDto>> = _categories.asStateFlow()
 
-    var selectedAccount: Account? = null
-    var selectedCategory: Category? = null
+    var selectedAccount: AccountDto? = null
+    var selectedCategory: CategoryDto? = null
     var amount: String = ""
     var date: String = ""
     var time: String = ""
@@ -51,8 +49,12 @@ class CreateTransactionViewModel(
                 return@launch
             }
             try {
-                val loadedAccounts = repository.getAccounts()
-                val loadedCategories = repository.getCategoriesByType(isIncome = (type == "доходы"))
+                val loadedAccounts = retryIO(times = 3, delayMillis = 2000){
+                    repository.getAccounts()
+                }
+                val loadedCategories = retryIO(times = 3, delayMillis = 2000){
+                    repository.getCategoriesByType(isIncome = (type == "доходы"))
+                }
                 _accounts.value = loadedAccounts
                 _categories.value = loadedCategories
                 _uiState.value = CreateTransactionUiState.Data(loadedAccounts, loadedCategories)
@@ -122,7 +124,7 @@ class CreateTransactionViewModel(
         _uiState.value = CreateTransactionUiState.Loading
         viewModelScope.launch {
             try {
-                val request = TransactionRequest(
+                val request = TransactionRequestDto(
                     accountId = acc.id,
                     categoryId = cat.id,
                     amount = amountString,
@@ -130,13 +132,14 @@ class CreateTransactionViewModel(
                     comment = commentToSend
                 )
                 Log.d("taaag", request.toString())
-                repository.createTransaction(request)
+                retryIO(times = 3, delayMillis = 2000) {
+                    repository.createTransaction(request)
+                }
                 _uiState.value = CreateTransactionUiState.Success
             } catch (e: Exception) {
                 _uiState.value = CreateTransactionUiState.Error("Ошибка при создании: ${e.localizedMessage}")
             }
         }
-
 
     }
 

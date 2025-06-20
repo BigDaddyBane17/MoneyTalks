@@ -1,11 +1,13 @@
 package com.example.moneytalks.data.remote.model
+import kotlinx.serialization.Serializable
 
-data class AccountHistory(
+@Serializable
+data class AccountHistoryDto(
     val id: Int,
     val accountId: Int,
     val changeType: String,
-    val previousState: AccountState?,
-    val newState: AccountState,
+    val previousState: AccountStateDto?,
+    val newState: AccountStateDto,
     val changeTimestamp: String,
     val createdAt: String
 )

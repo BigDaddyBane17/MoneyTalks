@@ -2,13 +2,12 @@ package com.example.moneytalks.presentation.account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.moneytalks.data.remote.model.Account
+import com.example.moneytalks.data.remote.model.AccountDto
 import com.example.moneytalks.domain.repository.BaseRepository
 import com.example.moneytalks.network.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -21,11 +20,12 @@ class AccountViewModel(
     val uiState: StateFlow<AccountUiState> = _uiState.asStateFlow()
 
 
-    private val _accounts = MutableStateFlow<List<Account>>(emptyList())
-    val accounts: StateFlow<List<Account>> = _accounts.asStateFlow()
+    private val _accounts = MutableStateFlow<List<AccountDto>>(emptyList())
+    val accounts: StateFlow<List<AccountDto>> = _accounts.asStateFlow()
 
     private val _selectedAccountId = MutableStateFlow<Int?>(null)
     val selectedAccountId: StateFlow<Int?> = _selectedAccountId.asStateFlow()
+
 
     fun handleIntent(intent: AccountIntent) {
         when (intent) {
@@ -49,8 +49,8 @@ class AccountViewModel(
                 val loadedAccounts = repository.getAccounts()
                 _accounts.value = loadedAccounts
 
-                if (_selectedAccountId.value == null && loadedAccounts.isNotEmpty()) {
-                    _selectedAccountId.value = loadedAccounts.first().id
+                if (_selectedAccountId.value == null || loadedAccounts.none { it.id == _selectedAccountId.value }) {
+                    _selectedAccountId.value = loadedAccounts.firstOrNull()?.id
                 }
 
                 val selected = loadedAccounts.firstOrNull { it.id == _selectedAccountId.value }
@@ -64,6 +64,7 @@ class AccountViewModel(
             }
         }
     }
+
 
     fun selectAccount(accountId: Int) {
         _selectedAccountId.value = accountId

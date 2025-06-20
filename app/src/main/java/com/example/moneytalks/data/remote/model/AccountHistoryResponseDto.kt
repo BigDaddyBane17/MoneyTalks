@@ -1,9 +1,11 @@
 package com.example.moneytalks.data.remote.model
+import kotlinx.serialization.Serializable
 
-data class AccountHistoryResponse(
+@Serializable
+data class AccountHistoryResponseDto(
     val accountId: Int,
     val accountName: String,
     val currency: String,
     val currentBalance: String,
-    val history: List<AccountHistory>
+    val history: List<AccountHistoryDto>
 )

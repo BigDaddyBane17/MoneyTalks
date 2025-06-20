@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.domain.repository.BaseRepository
 import com.example.moneytalks.network.NetworkMonitor
+import com.example.moneytalks.network.retryIO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,10 +35,12 @@ class HistoryViewModel(
             }
 
             try {
-                val historyList = repository.getTransactionsByPeriod(
-                    accountId, startDate, endDate
-                ).filter {
-                    it.category.isIncome == isIncome
+                val historyList = retryIO(times = 3, delayMillis = 2000) {
+                    repository.getTransactionsByPeriod(
+                        accountId, startDate, endDate
+                    ).filter {
+                        it.category.isIncome == isIncome
+                    }
                 }
                 val total = historyList.sumOf { it.amount.toDouble() }
                 _uiState.value = HistoryUiState.Success(historyList, "%,.2f ₽".format(total))

@@ -1,6 +1,8 @@
 package com.example.moneytalks.data.remote.model
+import kotlinx.serialization.Serializable
 
-data class AccountBrief(
+@Serializable
+data class AccountStateDto(
     val id: Int,
     val name: String,
     val balance: String,

@@ -1,12 +1,14 @@
 package com.example.moneytalks.data.remote.model
 
-data class AccountResponse(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AccountDto(
     val id: Int,
+    val userId: String,
     val name: String,
     val balance: String,
     val currency: String,
-    val incomeStats: List<StatItem>,
-    val expenseStats: List<StatItem>,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
 )

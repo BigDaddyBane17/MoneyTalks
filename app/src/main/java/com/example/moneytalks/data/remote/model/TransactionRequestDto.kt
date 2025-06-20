@@ -1,6 +1,9 @@
 package com.example.moneytalks.data.remote.model
 
-data class TransactionRequest(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class TransactionRequestDto(
     val accountId: Int,
     val categoryId: Int,
     val amount: String,

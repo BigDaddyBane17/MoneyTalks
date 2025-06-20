@@ -1,32 +1,32 @@
 package com.example.moneytalks.domain.repository
 
-import com.example.moneytalks.data.remote.model.Account
-import com.example.moneytalks.data.remote.model.AccountCreateRequest
-import com.example.moneytalks.data.remote.model.AccountHistoryResponse
-import com.example.moneytalks.data.remote.model.AccountResponse
-import com.example.moneytalks.data.remote.model.AccountUpdateRequest
-import com.example.moneytalks.data.remote.model.Category
-import com.example.moneytalks.data.remote.model.Transaction
-import com.example.moneytalks.data.remote.model.TransactionRequest
-import com.example.moneytalks.data.remote.model.TransactionResponse
+import com.example.moneytalks.data.remote.model.AccountDto
+import com.example.moneytalks.data.remote.model.AccountCreateRequestDto
+import com.example.moneytalks.data.remote.model.AccountHistoryResponseDto
+import com.example.moneytalks.data.remote.model.AccountResponseDto
+import com.example.moneytalks.data.remote.model.AccountUpdateRequestDto
+import com.example.moneytalks.data.remote.model.CategoryDto
+import com.example.moneytalks.data.remote.model.TransactionDto
+import com.example.moneytalks.data.remote.model.TransactionRequestDto
+import com.example.moneytalks.data.remote.model.TransactionResponseDto
 
 interface BaseRepository {
 
-    suspend fun getAccounts(): List<Account>
-    suspend fun getAccountById(id: Int): AccountResponse
-    suspend fun createAccount(request: AccountCreateRequest): Account
-    suspend fun updateAccount(id: Int, request: AccountUpdateRequest): Account
+    suspend fun getAccounts(): List<AccountDto>
+    suspend fun getAccountById(id: Int): AccountResponseDto
+    suspend fun createAccount(request: AccountCreateRequestDto): AccountDto
+    suspend fun updateAccount(id: Int, request: AccountUpdateRequestDto): AccountDto
     suspend fun deleteAccount(id: Int)
-    suspend fun getAccountHistory(id: Int): AccountHistoryResponse
+    suspend fun getAccountHistory(id: Int): AccountHistoryResponseDto
 
-    suspend fun getCategories(): List<Category>
-    suspend fun getCategoriesByType(isIncome: Boolean): List<Category>
+    suspend fun getCategories(): List<CategoryDto>
+    suspend fun getCategoriesByType(isIncome: Boolean): List<CategoryDto>
 
-    suspend fun createTransaction(request: TransactionRequest): Transaction
-    suspend fun getTransactionById(id: Int): TransactionResponse
-    suspend fun updateTransaction(id: Int, request: TransactionRequest): TransactionResponse
+    suspend fun createTransaction(request: TransactionRequestDto): TransactionDto
+    suspend fun getTransactionById(id: Int): TransactionResponseDto
+    suspend fun updateTransaction(id: Int, request: TransactionRequestDto): TransactionResponseDto
     suspend fun deleteTransaction(id: Int)
-    suspend fun getTransactionsByPeriod(accountId: Int, startDate: String?, endDate: String?): List<TransactionResponse>
+    suspend fun getTransactionsByPeriod(accountId: Int, startDate: String?, endDate: String?): List<TransactionResponseDto>
 
 
 }

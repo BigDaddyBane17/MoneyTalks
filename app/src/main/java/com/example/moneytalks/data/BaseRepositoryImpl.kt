@@ -1,36 +1,36 @@
 package com.example.moneytalks.data
 
 import com.example.moneytalks.data.remote.ApiService
-import com.example.moneytalks.data.remote.model.Account
-import com.example.moneytalks.data.remote.model.AccountCreateRequest
-import com.example.moneytalks.data.remote.model.AccountHistoryResponse
-import com.example.moneytalks.data.remote.model.AccountResponse
-import com.example.moneytalks.data.remote.model.AccountUpdateRequest
-import com.example.moneytalks.data.remote.model.Category
-import com.example.moneytalks.data.remote.model.Transaction
-import com.example.moneytalks.data.remote.model.TransactionRequest
-import com.example.moneytalks.data.remote.model.TransactionResponse
+import com.example.moneytalks.data.remote.model.AccountDto
+import com.example.moneytalks.data.remote.model.AccountCreateRequestDto
+import com.example.moneytalks.data.remote.model.AccountHistoryResponseDto
+import com.example.moneytalks.data.remote.model.AccountResponseDto
+import com.example.moneytalks.data.remote.model.AccountUpdateRequestDto
+import com.example.moneytalks.data.remote.model.CategoryDto
+import com.example.moneytalks.data.remote.model.TransactionDto
+import com.example.moneytalks.data.remote.model.TransactionRequestDto
+import com.example.moneytalks.data.remote.model.TransactionResponseDto
 import com.example.moneytalks.domain.repository.BaseRepository
 
 class BaseRepositoryImpl(
     private val api: ApiService
 ): BaseRepository {
-    override suspend fun getAccounts(): List<Account> {
+    override suspend fun getAccounts(): List<AccountDto> {
         return api.getAccounts()
     }
 
-    override suspend fun getAccountById(id: Int): AccountResponse {
+    override suspend fun getAccountById(id: Int): AccountResponseDto {
         return api.getAccountById(id)
     }
 
-    override suspend fun createAccount(request: AccountCreateRequest): Account {
+    override suspend fun createAccount(request: AccountCreateRequestDto): AccountDto {
         return api.createAccount(request)
     }
 
     override suspend fun updateAccount(
         id: Int,
-        request: AccountUpdateRequest
-    ): Account {
+        request: AccountUpdateRequestDto
+    ): AccountDto {
         return api.updateAccountById(id, request)
     }
 
@@ -38,30 +38,30 @@ class BaseRepositoryImpl(
         return api.deleteAccountById(id)
     }
 
-    override suspend fun getAccountHistory(id: Int): AccountHistoryResponse {
+    override suspend fun getAccountHistory(id: Int): AccountHistoryResponseDto {
         return api.getAccountHistory(id)
     }
 
-    override suspend fun getCategories(): List<Category> {
+    override suspend fun getCategories(): List<CategoryDto> {
         return api.getCategories()
     }
 
-    override suspend fun getCategoriesByType(isIncome: Boolean): List<Category> {
+    override suspend fun getCategoriesByType(isIncome: Boolean): List<CategoryDto> {
         return api.getCategoriesByType(isIncome)
     }
 
-    override suspend fun createTransaction(request: TransactionRequest): Transaction {
+    override suspend fun createTransaction(request: TransactionRequestDto): TransactionDto {
         return api.createTransaction(request)
     }
 
-    override suspend fun getTransactionById(id: Int): TransactionResponse {
+    override suspend fun getTransactionById(id: Int): TransactionResponseDto {
         return api.getTransactionById(id)
     }
 
     override suspend fun updateTransaction(
         id: Int,
-        request: TransactionRequest
-    ): TransactionResponse {
+        request: TransactionRequestDto
+    ): TransactionResponseDto {
         return api.updateTransaction(id, request)
     }
 
@@ -73,7 +73,7 @@ class BaseRepositoryImpl(
         accountId: Int,
         startDate: String?,
         endDate: String?
-    ): List<TransactionResponse> {
+    ): List<TransactionResponseDto> {
         return api.getTransactionsByPeriod(accountId, startDate, endDate)
     }
 }

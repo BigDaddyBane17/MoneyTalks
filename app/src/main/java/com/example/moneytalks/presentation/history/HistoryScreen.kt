@@ -6,12 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -19,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,17 +35,9 @@ import com.example.moneytalks.data.BaseRepositoryImpl
 import com.example.moneytalks.data.remote.RetrofitInstance
 import com.example.moneytalks.network.NetworkMonitor
 import com.example.moneytalks.presentation.common.ListItem
-import com.example.moneytalks.presentation.common.TopAppBarState
-import com.example.moneytalks.presentation.common.TopAppBarStateProvider
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
-import com.vanpra.composematerialdialogs.datetime.time.timepicker
-import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDate.now
-import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -68,8 +57,8 @@ fun HistoryScreen(
     val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModelFactory(repository, networkMonitor))
 
     // Даты фильтрации
-    var startDate by rememberSaveable { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
-    var endDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
+    var startDate by rememberSaveable { mutableStateOf(now().withDayOfMonth(1)) }
+    var endDate by rememberSaveable { mutableStateOf(now()) }
     var pickerTarget by remember { mutableStateOf<String?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -146,21 +135,21 @@ fun HistoryScreen(
                         .sortedBy {
                             Instant.parse(it.createdAt)
                         }
-                        .forEach { tx ->
+                        .forEach { transaction ->
                             val formattedDate = try {
-                                val instant = Instant.parse(tx.createdAt)
+                                val instant = Instant.parse(transaction.createdAt)
                                 val dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime()
                                 dateTime.format(outputFormatter)
                             } catch (e: Exception) {
-                                tx.createdAt
+                                transaction.createdAt
                             }
                             ListItem(
-                                title = tx.category.name,
-                                leadingIcon = tx.category.emoji,
+                                title = transaction.category.name,
+                                leadingIcon = transaction.category.emoji,
                                 trailingIcon = R.drawable.more_vert,
-                                amount = tx.amount,
+                                amount = transaction.amount,
                                 currency = "₽",
-                                description = tx.comment,
+                                description = transaction.comment,
                                 subtitle = formattedDate,
                                 modifier = Modifier,
                                 onClick = {}

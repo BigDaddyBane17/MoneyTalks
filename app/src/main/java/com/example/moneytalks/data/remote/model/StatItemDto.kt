@@ -1,6 +1,8 @@
 package com.example.moneytalks.data.remote.model
+import kotlinx.serialization.Serializable
 
-data class StatItem(
+@Serializable
+data class StatItemDto(
     val categoryId: Int,
     val categoryName: String,
     val emoji: String,

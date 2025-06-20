@@ -1,14 +1,14 @@
 package com.example.moneytalks.data.remote
 
-import com.example.moneytalks.data.remote.model.Account
-import com.example.moneytalks.data.remote.model.AccountCreateRequest
-import com.example.moneytalks.data.remote.model.AccountHistoryResponse
-import com.example.moneytalks.data.remote.model.AccountResponse
-import com.example.moneytalks.data.remote.model.AccountUpdateRequest
-import com.example.moneytalks.data.remote.model.Category
-import com.example.moneytalks.data.remote.model.Transaction
-import com.example.moneytalks.data.remote.model.TransactionRequest
-import com.example.moneytalks.data.remote.model.TransactionResponse
+import com.example.moneytalks.data.remote.model.AccountDto
+import com.example.moneytalks.data.remote.model.AccountCreateRequestDto
+import com.example.moneytalks.data.remote.model.AccountHistoryResponseDto
+import com.example.moneytalks.data.remote.model.AccountResponseDto
+import com.example.moneytalks.data.remote.model.AccountUpdateRequestDto
+import com.example.moneytalks.data.remote.model.CategoryDto
+import com.example.moneytalks.data.remote.model.TransactionDto
+import com.example.moneytalks.data.remote.model.TransactionRequestDto
+import com.example.moneytalks.data.remote.model.TransactionResponseDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -20,44 +20,44 @@ import retrofit2.http.Query
 interface ApiService {
 
     @GET("accounts")
-    suspend fun getAccounts(): List<Account>
+    suspend fun getAccounts(): List<AccountDto>
 
     @POST("accounts")
-    suspend fun createAccount(@Body request: AccountCreateRequest): Account
+    suspend fun createAccount(@Body request: AccountCreateRequestDto): AccountDto
 
     @GET("account/{id}")
-    suspend fun getAccountById(@Path("id") id: Int): AccountResponse
+    suspend fun getAccountById(@Path("id") id: Int): AccountResponseDto
 
     @PUT("account/{id}")
     suspend fun updateAccountById(
         @Path("id") id: Int,
-        @Body request: AccountUpdateRequest
-    ): Account
+        @Body request: AccountUpdateRequestDto
+    ): AccountDto
 
     @DELETE("accounts/{id}")
     suspend fun deleteAccountById(@Path("id") id: Int)
 
     @GET("accounts/{id}/history")
-    suspend fun getAccountHistory(@Path("id") id: Int): AccountHistoryResponse
+    suspend fun getAccountHistory(@Path("id") id: Int): AccountHistoryResponseDto
 
 
     @GET("categories")
-    suspend fun getCategories(): List<Category>
+    suspend fun getCategories(): List<CategoryDto>
 
     @GET("categories/type/{isIncome}")
-    suspend fun getCategoriesByType(@Path("isIncome") isIncome: Boolean): List<Category>
+    suspend fun getCategoriesByType(@Path("isIncome") isIncome: Boolean): List<CategoryDto>
 
     @POST("transactions")
-    suspend fun createTransaction(@Body request: TransactionRequest): Transaction
+    suspend fun createTransaction(@Body request: TransactionRequestDto): TransactionDto
 
     @GET("transactions/{id}")
-    suspend fun getTransactionById(@Path("id") id: Int): TransactionResponse
+    suspend fun getTransactionById(@Path("id") id: Int): TransactionResponseDto
 
     @PUT("transactions/{id}")
     suspend fun updateTransaction(
         @Path("id") id: Int,
-        @Body request: TransactionRequest
-    ): TransactionResponse
+        @Body request: TransactionRequestDto
+    ): TransactionResponseDto
 
     @DELETE("transactions/{id}")
     suspend fun deleteTransaction(@Path("id") id: Int)
@@ -67,6 +67,6 @@ interface ApiService {
         @Path("accountId") accountId: Int,
         @Query("startDate") startDate: String?,
         @Query("endDate") endDate: String?
-    ): List<TransactionResponse>
+    ): List<TransactionResponseDto>
 
 }
