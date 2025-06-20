@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.data.remote.model.AccountDto
 import com.example.moneytalks.domain.repository.BaseRepository
 import com.example.moneytalks.network.NetworkMonitor
+import com.example.moneytalks.network.retryIO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,7 +47,9 @@ class AccountViewModel(
                 return@launch
             }
             try {
-                val loadedAccounts = repository.getAccounts()
+                val loadedAccounts = retryIO(times = 3, delayMillis = 2000){
+                    repository.getAccounts()
+                }
                 _accounts.value = loadedAccounts
 
                 if (_selectedAccountId.value == null || loadedAccounts.none { it.id == _selectedAccountId.value }) {
