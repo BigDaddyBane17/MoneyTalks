@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.data.BaseRepositoryImpl
 import com.example.moneytalks.data.remote.RetrofitInstance
+import com.example.moneytalks.network.NetworkMonitor
 import com.example.moneytalks.presentation.common.ListItem
 import com.example.moneytalks.presentation.common.TopAppBarState
 import com.example.moneytalks.presentation.common.TopAppBarStateProvider
@@ -57,13 +58,14 @@ import java.util.Locale
 fun HistoryScreen(
     navController: NavHostController,
     type: String,
-    accountId: Int?
+    accountId: Int?,
+    networkMonitor: NetworkMonitor
 ) {
     val isIncome = type == "доходы"
 
     // Вьюмодель для истории
     val repository = remember { BaseRepositoryImpl(RetrofitInstance.api) }
-    val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModelFactory(repository))
+    val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModelFactory(repository, networkMonitor))
 
     // Даты фильтрации
     var startDate by rememberSaveable { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
@@ -75,16 +77,14 @@ fun HistoryScreen(
 
 
     LaunchedEffect(accountId, startDate, endDate, type) {
-        if(accountId != null) {
-            viewModel.handleIntent(
-                HistoryIntent.LoadHistory(
-                    accountId = accountId,
-                    startDate = startDate.toString(),
-                    endDate = endDate.toString()
-                ),
-                isIncome = isIncome
-            )
-        }
+        viewModel.handleIntent(
+            HistoryIntent.LoadHistory(
+                accountId = accountId,
+                startDate = startDate.toString(),
+                endDate = endDate.toString()
+            ),
+            isIncome = isIncome
+        )
     }
 
     val uiState by viewModel.uiState.collectAsState()
@@ -172,7 +172,8 @@ fun HistoryScreen(
             is HistoryUiState.Error -> {
                 Text(
                     state.message,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
+                    color = Color.Red
                 )
             }
         }

@@ -1,6 +1,8 @@
 package com.example.moneytalks.presentation.navigation
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -16,6 +18,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moneytalks.R
 import com.example.moneytalks.data.BaseRepositoryImpl
 import com.example.moneytalks.data.remote.RetrofitInstance
+import com.example.moneytalks.network.NetworkMonitor
 import com.example.moneytalks.presentation.account.AccountViewModel
 import com.example.moneytalks.presentation.account.AccountsViewModelFactory
 import com.example.moneytalks.presentation.common.TopAppBarState
@@ -40,10 +46,22 @@ import com.example.moneytalks.presentation.common.TopBar
 import com.example.moneytalks.presentation.create_transaction.CreateTransactionIntent
 import com.example.moneytalks.presentation.create_transaction.CreateTransactionViewModel
 import com.example.moneytalks.presentation.create_transaction.CreateTransactionViewModelFactory
+import com.example.moneytalks.presentation.transactions.TransactionViewModel
+import com.example.moneytalks.presentation.transactions.TransactionViewModelFactory
 
 
 @Composable
 fun MainAppScreen() {
+
+    val context = LocalContext.current.applicationContext
+    val networkMonitor = remember { NetworkMonitor(context) }
+
+    LaunchedEffect(Unit) { networkMonitor.start() }
+    DisposableEffect(Unit) { onDispose { networkMonitor.stop() } }
+
+    val isConnected by networkMonitor.isConnected.collectAsState()
+
+
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -53,15 +71,24 @@ fun MainAppScreen() {
     //вьюмодели для доходов расходов
     val spendingViewModel: CreateTransactionViewModel = viewModel(
         key = "spendings",
-        factory = CreateTransactionViewModelFactory(repository, type = "расходы")
+        factory = CreateTransactionViewModelFactory(repository, type = "расходы", networkMonitor)
     )
     val earningViewModel: CreateTransactionViewModel = viewModel(
         key = "earnings",
-        factory = CreateTransactionViewModelFactory(repository, type = "доходы")
+        factory = CreateTransactionViewModelFactory(repository, type = "доходы", networkMonitor)
+    )
+
+    val transactionSpendingViewModel: TransactionViewModel = viewModel(
+        key = "spendings",
+        factory = TransactionViewModelFactory(repository, "расходы", networkMonitor)
+    )
+    val transactionEarningViewModel: TransactionViewModel = viewModel(
+        key = "spendings",
+        factory = TransactionViewModelFactory(repository, "доходы", networkMonitor)
     )
 
     //вьюмодель для счетов
-    val accountViewModel: AccountViewModel = viewModel(factory = AccountsViewModelFactory(repository))
+    val accountViewModel: AccountViewModel = viewModel(factory = AccountsViewModelFactory(repository, networkMonitor))
 
 
     val accounts by accountViewModel.accounts.collectAsState()
@@ -183,6 +210,16 @@ fun MainAppScreen() {
         }
     }
 
+    if (!isConnected) {
+        Box(Modifier.fillMaxWidth().background(Color.Red)) {
+            Text(
+                "Нет соединения с интернетом",
+                color = Color.White,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
             Box {
@@ -279,7 +316,10 @@ fun MainAppScreen() {
             selectedAccountId = selectedAccountId,
             earningViewModel = earningViewModel,
             spendingViewModel = spendingViewModel,
-            accountViewModel = accountViewModel
+            accountViewModel = accountViewModel,
+            transactionSpendingViewModel = transactionSpendingViewModel,
+            transactionEarningViewModel = transactionEarningViewModel,
+            networkMonitor = networkMonitor
         )
     }
 }

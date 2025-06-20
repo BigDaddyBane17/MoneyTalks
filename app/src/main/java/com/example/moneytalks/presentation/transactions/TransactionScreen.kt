@@ -26,7 +26,9 @@ import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.data.BaseRepositoryImpl
 import com.example.moneytalks.data.remote.RetrofitInstance
+import com.example.moneytalks.network.NetworkMonitor
 import com.example.moneytalks.presentation.common.ListItem
+import java.time.LocalDate
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,22 +36,20 @@ import com.example.moneytalks.presentation.common.ListItem
 fun SpendingScreen(
     navController: NavHostController,
     accountId: Int?,
-    type: String
+    viewModel: TransactionViewModel
 ) {
 
-    val repository = remember { BaseRepositoryImpl(RetrofitInstance.api) }
-    val viewModel: TransactionViewModel = viewModel(
-        factory = TransactionViewModelFactory(repository, type)
-    )
 
     val uiState by viewModel.uiState.collectAsState()
 
 
     LaunchedEffect(accountId) {
-        if(accountId != null) {
-            viewModel.handleIntent(TransactionIntent.LoadExpenses(accountId = accountId, startDate = "2025-06-18", endDate = "2025-06-19"))
-        }
-
+        viewModel.handleIntent(TransactionIntent.LoadExpenses(
+            accountId = accountId,
+            startDate = LocalDate.now().toString(),
+            endDate = LocalDate.now().toString()
+        )
+        )
     }
 
     when (uiState) {
@@ -66,6 +66,16 @@ fun SpendingScreen(
                 ListItem(
                     modifier = Modifier.height(56.dp),
                     title = "Всего",
+                    currency =
+                        if(state.items.firstOrNull()?.account?.currency == "EUR") {
+                            "€"
+                        }
+                        else if (state.items.firstOrNull()?.account?.currency == "USD") {
+                            "$"
+                        }
+                        else {
+                            "₽"
+                        },
                     amount = state.total,
                     backgroundColor = Color(0xFFD4FAE6),
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
@@ -86,7 +96,16 @@ fun SpendingScreen(
                             contentPadding = if (item.comment != null)
                                 PaddingValues(vertical = 16.dp, horizontal = 16.dp)
                             else PaddingValues(vertical = 24.dp, horizontal = 16.dp),
-                            currency = item.account.currency,
+                            currency =
+                                if(state.items.firstOrNull()?.account?.currency == "EUR") {
+                                    "€"
+                                }
+                                else if (state.items.firstOrNull()?.account?.currency == "USD") {
+                                    "$"
+                                }
+                                else {
+                                    "₽"
+                                },
                             modifier = Modifier
                         )
                         HorizontalDivider()

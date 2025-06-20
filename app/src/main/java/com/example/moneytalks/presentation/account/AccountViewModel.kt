@@ -4,19 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.data.remote.model.Account
 import com.example.moneytalks.domain.repository.BaseRepository
+import com.example.moneytalks.network.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class AccountViewModel(
-    private val repository: BaseRepository
+    private val repository: BaseRepository,
+    private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AccountUiState>(AccountUiState.Loading)
     val uiState: StateFlow<AccountUiState> = _uiState.asStateFlow()
-
 
 
     private val _accounts = MutableStateFlow<List<Account>>(emptyList())
@@ -33,21 +35,33 @@ class AccountViewModel(
         }
     }
 
-    init { loadAccounts() }
+    init {
+        loadAccounts()
+    }
 
     fun loadAccounts() {
         viewModelScope.launch {
-            val loadedAccounts = repository.getAccounts()
-            _accounts.value = loadedAccounts
-
-            if (_selectedAccountId.value == null && loadedAccounts.isNotEmpty()) {
-                _selectedAccountId.value = loadedAccounts.first().id
+            if (!networkMonitor.isConnected.value) {
+                _uiState.value = AccountUiState.Error("Нет соединения с интернетом")
+                return@launch
             }
+            try {
+                val loadedAccounts = repository.getAccounts()
+                _accounts.value = loadedAccounts
 
-            val selected = loadedAccounts.firstOrNull { it.id == _selectedAccountId.value }
-                ?: loadedAccounts.firstOrNull()
+                if (_selectedAccountId.value == null && loadedAccounts.isNotEmpty()) {
+                    _selectedAccountId.value = loadedAccounts.first().id
+                }
 
-            _uiState.value = AccountUiState.Success(selected)
+                val selected = loadedAccounts.firstOrNull { it.id == _selectedAccountId.value }
+                    ?: loadedAccounts.firstOrNull()
+
+                _uiState.value = AccountUiState.Success(selected)
+            } catch (e: IOException) {
+                _uiState.value = AccountUiState.Error("Нет соединения с интернетом")
+            } catch (e: Exception) {
+                _uiState.value = AccountUiState.Error("Ошибка загрузки: ${e.localizedMessage}")
+            }
         }
     }
 
@@ -58,18 +72,15 @@ class AccountViewModel(
     }
 
     private fun changeCurrency(currency: String) {
-        _uiState.update { oldState ->
-            if(oldState is AccountUiState.Success) {
-                oldState.copy(account = oldState.account?.copy(currency = currency))
-            }
-            else {
-                oldState
-            }
-        }
+//        _uiState.update { oldState ->
+//            if(oldState is AccountUiState.Success) {
+//                oldState.copy(account = oldState.account?.copy(currency = currency))
+//            }
+//            else {
+//                oldState
+//            }
+//        }
     }
-
-
-
 
 
 }

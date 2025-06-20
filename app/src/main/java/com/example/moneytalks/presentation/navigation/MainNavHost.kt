@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.moneytalks.network.NetworkMonitor
 import com.example.moneytalks.presentation.account.AccountScreen
 import com.example.moneytalks.presentation.account.AccountViewModel
 import com.example.moneytalks.presentation.analysis.AnalysisScreen
@@ -18,6 +19,7 @@ import com.example.moneytalks.presentation.item_expenses.ItemExpensesScreen
 import com.example.moneytalks.presentation.settings.SettingsScreen
 import com.example.moneytalks.presentation.transactions.SpendingScreen
 import com.example.moneytalks.presentation.history.HistoryScreen
+import com.example.moneytalks.presentation.transactions.TransactionViewModel
 
 @Composable
 fun MainNavHost(
@@ -27,7 +29,10 @@ fun MainNavHost(
     selectedAccountId: Int?,
     spendingViewModel: CreateTransactionViewModel,
     earningViewModel: CreateTransactionViewModel,
-    accountViewModel: AccountViewModel
+    transactionSpendingViewModel: TransactionViewModel,
+    transactionEarningViewModel: TransactionViewModel,
+    accountViewModel: AccountViewModel,
+    networkMonitor: NetworkMonitor
 ) {
     NavHost(
         navController = navController,
@@ -39,13 +44,14 @@ fun MainNavHost(
             composable("расходы") { SpendingScreen(
                 navController = navController,
                 accountId = selectedAccountId,
-                type = "расходы"
+                viewModel = transactionSpendingViewModel
             ) }
             composable("расходы_история") {
                 HistoryScreen(
                     navController = navController,
                     type = "расходы",
-                    accountId = selectedAccountId
+                    accountId = selectedAccountId,
+                    networkMonitor = networkMonitor
                 )
             }
             composable("расходы_добавить") {
@@ -62,13 +68,14 @@ fun MainNavHost(
             composable("доходы") { SpendingScreen(
                 navController = navController,
                 accountId = selectedAccountId,
-                type = "доходы"
+                viewModel = transactionEarningViewModel
             ) }
             composable("доходы_история") {
                 HistoryScreen(
                     navController = navController,
                     type = "доходы",
-                    accountId = selectedAccountId
+                    accountId = selectedAccountId,
+                    networkMonitor = networkMonitor
                 )
             }
             composable("доходы_добавить") {

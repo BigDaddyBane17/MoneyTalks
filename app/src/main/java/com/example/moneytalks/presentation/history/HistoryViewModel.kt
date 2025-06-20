@@ -3,13 +3,16 @@ package com.example.moneytalks.presentation.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.domain.repository.BaseRepository
+import com.example.moneytalks.network.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class HistoryViewModel(
-    private val repository: BaseRepository
+    private val repository: BaseRepository,
+    private val networkMonitor: NetworkMonitor
 ): ViewModel() {
     private val _uiState = MutableStateFlow<HistoryUiState>(HistoryUiState.Loading)
     val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
@@ -25,8 +28,12 @@ class HistoryViewModel(
         viewModelScope.launch {
             _uiState.value = HistoryUiState.Loading
 
+            if (!networkMonitor.isConnected.value) {
+                _uiState.value = HistoryUiState.Error("Нет соединения с интернетом")
+                return@launch
+            }
+
             try {
-                //delay(2000)
                 val historyList = repository.getTransactionsByPeriod(
                     accountId, startDate, endDate
                 ).filter {
@@ -35,12 +42,16 @@ class HistoryViewModel(
                 val total = historyList.sumOf { it.amount.toDouble() }
                 _uiState.value = HistoryUiState.Success(historyList, "%,.2f ₽".format(total))
             }
+            catch (e: IOException) {
+                _uiState.value = HistoryUiState.Error("Нет соединения с интернетом")
+            }
             catch (e: Exception) {
                 _uiState.value = HistoryUiState.Error(
-                    "Ошибка: ${e.message}"
+                    "Ошибка: ${e.localizedMessage}"
                 )
             }
         }
     }
+
 
 }

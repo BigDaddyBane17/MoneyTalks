@@ -133,6 +133,16 @@ fun AccountScreen(
                 ListItem(
                     title = "Баланс",
                     amount = state.account?.balance,
+                    currency =
+                        if(state.account?.currency == "EUR") {
+                            "€"
+                        }
+                        else if (state.account?.currency == "USD") {
+                            "$"
+                        }
+                        else {
+                            "₽"
+                        },
                     backgroundColor = Color(0xFFD4FAE6),
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                     trailingIcon = R.drawable.more_vert,
@@ -145,7 +155,16 @@ fun AccountScreen(
                 HorizontalDivider()
                 ListItem(
                     title = "Валюта",
-                    amount = state.account?.currency,
+                    amount =
+                        if(state.account?.currency == "EUR") {
+                            "€"
+                        }
+                        else if (state.account?.currency == "USD") {
+                            "$"
+                        }
+                        else {
+                            "₽"
+                        },
                     backgroundColor = Color(0xFFD4FAE6),
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                     trailingIcon = R.drawable.more_vert,

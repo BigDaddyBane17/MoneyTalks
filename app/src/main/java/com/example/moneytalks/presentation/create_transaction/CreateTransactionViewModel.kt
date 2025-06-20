@@ -10,15 +10,18 @@ import com.example.moneytalks.data.remote.model.Account
 import com.example.moneytalks.data.remote.model.Category
 import com.example.moneytalks.data.remote.model.TransactionRequest
 import com.example.moneytalks.domain.repository.BaseRepository
+import com.example.moneytalks.network.NetworkMonitor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.Locale
 
 class CreateTransactionViewModel(
     private val repository: BaseRepository,
-    private val type: String
+    private val type: String,
+    private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CreateTransactionUiState>(CreateTransactionUiState.Loading)
@@ -43,17 +46,24 @@ class CreateTransactionViewModel(
 
     private fun loadInitialData() {
         viewModelScope.launch {
+            if (!networkMonitor.isConnected.value) {
+                _uiState.value = CreateTransactionUiState.Error("Нет соединения с интернетом")
+                return@launch
+            }
             try {
                 val loadedAccounts = repository.getAccounts()
                 val loadedCategories = repository.getCategoriesByType(isIncome = (type == "доходы"))
                 _accounts.value = loadedAccounts
                 _categories.value = loadedCategories
                 _uiState.value = CreateTransactionUiState.Data(loadedAccounts, loadedCategories)
+            } catch (e: IOException) {
+                _uiState.value = CreateTransactionUiState.Error("Нет соединения с интернетом")
             } catch (e: Exception) {
                 _uiState.value = CreateTransactionUiState.Error("Ошибка загрузки: ${e.localizedMessage}")
             }
         }
     }
+
 
 
     fun handleIntent(intent: CreateTransactionIntent) {
