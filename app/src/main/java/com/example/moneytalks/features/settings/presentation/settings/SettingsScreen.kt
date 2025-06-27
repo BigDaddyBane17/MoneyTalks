@@ -35,12 +35,6 @@ fun SettingsScreen(
         viewModel.handleIntent(SettingsIntent.LoadSettings)
     }
 
-//    TopAppBarStateProvider.update(
-//        TopAppBarState(
-//            title = "Настройки"
-//        )
-//    )
-
     when (uiState) {
         is SettingsUiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

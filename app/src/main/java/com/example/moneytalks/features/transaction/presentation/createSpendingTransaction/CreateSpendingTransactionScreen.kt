@@ -1,4 +1,4 @@
-package com.example.moneytalks.features.transaction.presentation.create_spending_transaction
+package com.example.moneytalks.features.transaction.presentation.createSpendingTransaction
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,11 +40,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.coreui.composable.ListItem
-import com.example.moneytalks.features.transaction.presentation.create_earning_transaction.CreateEarningTransactionUiState
-import com.example.moneytalks.features.transaction.presentation.create_spending_transaction.CreateSpendingTransactionIntent.*
+import com.example.moneytalks.features.transaction.presentation.createSpendingTransaction.CreateSpendingTransactionIntent.*
 import java.time.Instant
 import java.time.ZoneId
 
@@ -52,11 +53,11 @@ import java.time.ZoneId
 @Composable
 fun CreateSpendingTransactionScreen(
     navController: NavHostController,
-    viewModel: CreateSpendingTransactionViewModel
+    viewModel: CreateSpendingTransactionViewModel,
 ) {
 
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showAccountMenu by remember { mutableStateOf(false) }
     var showCategoryMenu by remember { mutableStateOf(false) }
@@ -296,4 +297,3 @@ fun CreateSpendingTransactionScreen(
 
     }
 }
-

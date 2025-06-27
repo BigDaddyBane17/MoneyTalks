@@ -13,6 +13,10 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 
+/**
+ * ViewModel для загрузки и отображения истории транзакций с фильтрацией по типу (доход/расход).
+ */
+
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val repository: TransactionRepository,
@@ -23,8 +27,8 @@ class HistoryViewModel @Inject constructor(
 
 
     fun handleIntent(intent: HistoryIntent, isIncome: Boolean) {
-        when(intent) {
-            is HistoryIntent.LoadHistory -> loadHistory(intent.accountId ?: 1, intent.startDate, intent.endDate, isIncome)
+        when(intent) {                                              //тут мой дефолтный счет хз как по другому...
+            is HistoryIntent.LoadHistory -> loadHistory(intent.accountId ?: 66, intent.startDate, intent.endDate, isIncome)
         }
     }
 

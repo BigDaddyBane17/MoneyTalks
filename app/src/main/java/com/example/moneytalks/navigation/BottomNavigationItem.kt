@@ -14,4 +14,3 @@ val items = listOf(
     BottomNavigationItem("Статьи", R.drawable.articles),
     BottomNavigationItem("Настройки", R.drawable.settings),
 )
-

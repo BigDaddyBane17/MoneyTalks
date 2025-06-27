@@ -4,6 +4,10 @@ import com.example.moneytalks.features.transaction.data.remote.TransactionApiSer
 import com.example.moneytalks.features.transaction.data.remote.model.TransactionRequestDto
 import com.example.moneytalks.features.transaction.domain.repository.TransactionRepository
 
+/**
+ * Репозиторий для работы с транзакциями через API.
+ */
+
 class TransactionRepositoryImpl(
     private val api: TransactionApiService
 ): TransactionRepository {

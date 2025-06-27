@@ -13,6 +13,4 @@ fun AnalysisScreen(
     Text(
         "АНАЛИЗ $type"
     )
-
-    
 }

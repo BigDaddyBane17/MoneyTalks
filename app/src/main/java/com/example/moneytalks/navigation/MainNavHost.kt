@@ -6,18 +6,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.features.account.presentation.account.AccountScreen
 import com.example.moneytalks.features.account.presentation.account.AccountViewModel
 import com.example.moneytalks.features.transaction.presentation.analysis.AnalysisScreen
 import com.example.moneytalks.features.account.presentation.create_account.CreateAccount
-import com.example.moneytalks.features.transaction.presentation.create_earning_transaction.CreateEarningTransactionViewModel
-import com.example.moneytalks.features.transaction.presentation.create_spending_transaction.CreateSpendingTransactionViewModel
+import com.example.moneytalks.features.transaction.presentation.createEarningTransaction.CreateEarningTransactionViewModel
+import com.example.moneytalks.features.transaction.presentation.createSpendingTransaction.CreateSpendingTransactionViewModel
 import com.example.moneytalks.features.account.presentation.edit_account.EditAccountScreen
-import com.example.moneytalks.features.categories.presentation.item_expenses.ItemExpensesScreen
+import com.example.moneytalks.features.categories.presentation.category.CategoryScreen
 import com.example.moneytalks.features.settings.presentation.settings.SettingsScreen
-import com.example.moneytalks.features.transaction.presentation.create_earning_transaction.CreateEarningTransactionScreen
-import com.example.moneytalks.features.transaction.presentation.create_spending_transaction.CreateSpendingTransactionScreen
+import com.example.moneytalks.features.transaction.presentation.createEarningTransaction.CreateEarningTransactionScreen
+import com.example.moneytalks.features.transaction.presentation.createSpendingTransaction.CreateSpendingTransactionScreen
 import com.example.moneytalks.features.transaction.presentation.history.HistoryScreen
 import com.example.moneytalks.features.transaction.presentation.transactions.TransactionScreen
 import com.example.moneytalks.features.transaction.presentation.transactions.TransactionViewModel
@@ -26,14 +25,13 @@ import com.example.moneytalks.features.transaction.presentation.transactions.Tra
 fun MainNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = "расходы_граф",
+    startDestination: String = Routes.EXPENSES_GRAPH,
     selectedAccountId: Int?,
-    spendingViewModel: CreateSpendingTransactionViewModel,
-    earningViewModel: CreateEarningTransactionViewModel,
+    accountViewModel: AccountViewModel,
     transactionSpendingViewModel: TransactionViewModel,
     transactionEarningViewModel: TransactionViewModel,
-    accountViewModel: AccountViewModel,
-    networkMonitor: NetworkMonitor
+    spendingViewModel: CreateSpendingTransactionViewModel,
+    earningViewModel: CreateEarningTransactionViewModel,
 ) {
     NavHost(
         navController = navController,
@@ -41,79 +39,95 @@ fun MainNavHost(
         modifier = modifier
     ) {
         // Граф "Расходы"
-        navigation(startDestination = "расходы", route = "расходы_граф") {
-            composable("расходы") { TransactionScreen(
-                navController = navController,
-                accountId = selectedAccountId,
-                viewModel = transactionSpendingViewModel,
-                type = "расходы"
-            ) }
-            composable("расходы_история") {
+        navigation(startDestination = Routes.EXPENSES, route = Routes.EXPENSES_GRAPH) {
+            composable(Routes.EXPENSES) {
+                TransactionScreen(
+                    navController = navController,
+                    accountId = selectedAccountId,
+                    viewModel = transactionSpendingViewModel,
+                    type = Routes.EXPENSES
+                )
+            }
+            composable(Routes.EXPENSES_HISTORY) {
                 HistoryScreen(
                     navController = navController,
-                    type = "расходы",
+                    type = Routes.EXPENSES,
                     accountId = selectedAccountId
                 )
             }
-            composable("расходы_добавить") {
+            composable(Routes.EXPENSES_ADD) {
                 CreateSpendingTransactionScreen(
                     navController = navController,
                     viewModel = spendingViewModel
                 )
             }
-            composable("расходы_анализ") { AnalysisScreen(navController = navController, type = "расходы") }
+            composable(Routes.EXPENSES_ANALYSIS) {
+                AnalysisScreen(
+                    navController = navController,
+                    type = Routes.EXPENSES
+                )
+            }
         }
 
-
         // Граф "Доходы"
-        navigation(startDestination = "доходы", route = "доходы_граф") {
-            composable("доходы") { TransactionScreen(
-                navController = navController,
-                accountId = selectedAccountId,
-                viewModel = transactionEarningViewModel,
-                type = "доходы"
-            ) }
-            composable("доходы_история") {
+        navigation(startDestination = Routes.EARNINGS, route = Routes.EARNINGS_GRAPH) {
+            composable(Routes.EARNINGS) {
+                TransactionScreen(
+                    navController = navController,
+                    accountId = selectedAccountId,
+                    viewModel = transactionEarningViewModel,
+                    type = Routes.EARNINGS
+                )
+            }
+            composable(Routes.EARNINGS_HISTORY) {
                 HistoryScreen(
                     navController = navController,
-                    type = "доходы",
+                    type = Routes.EARNINGS,
                     accountId = selectedAccountId
                 )
             }
-            composable("доходы_добавить") {
+            composable(Routes.EARNINGS_ADD) {
                 CreateEarningTransactionScreen(
                     navController = navController,
                     viewModel = earningViewModel
                 )
             }
-            composable("доходы_анализ") { AnalysisScreen(navController = navController, type = "доходы") }
+            composable(Routes.EARNINGS_ANALYSIS) {
+                AnalysisScreen(
+                    navController = navController,
+                    type = Routes.EARNINGS
+                )
+            }
         }
 
-
         // Граф "Счет"
-        navigation(startDestination = "счет", route = "счет_граф") {
-            composable("счет") {
+        navigation(startDestination = Routes.ACCOUNT, route = Routes.ACCOUNTS_GRAPH) {
+            composable(Routes.ACCOUNT) {
                 AccountScreen(
                     navController = navController,
                     viewModel = accountViewModel
                 )
             }
-            composable("счет_добавить") { CreateAccount(navController = navController) }
-            composable("счет_редактировать") { EditAccountScreen(navController = navController) }
+            composable(Routes.ACCOUNT_ADD) {
+                CreateAccount(navController = navController)
+            }
+            composable(Routes.ACCOUNT_EDIT) {
+                EditAccountScreen(navController = navController)
+            }
         }
-
 
         // Граф "Статьи"
-        navigation(startDestination = "статьи", route = "статьи_граф") {
-            composable("статьи") { ItemExpensesScreen(navController = navController) }
+        navigation(startDestination = Routes.CATEGORIES, route = Routes.CATEGORIES_GRAPH) {
+            composable(Routes.CATEGORIES) {
+                CategoryScreen(navController = navController)
+            }
         }
 
-
         // Граф "Настройки"
-        navigation(startDestination = "настройки", route = "настройки_граф") {
-            composable("настройки") { SettingsScreen(navController = navController) }
+        navigation(startDestination = Routes.SETTINGS, route = Routes.SETTINGS_GRAPH) {
+            composable(Routes.SETTINGS) {
+                SettingsScreen(navController = navController)
+            }
         }
     }
 }
-
-

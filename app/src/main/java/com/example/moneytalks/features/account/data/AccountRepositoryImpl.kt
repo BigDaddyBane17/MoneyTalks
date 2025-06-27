@@ -5,6 +5,10 @@ import com.example.moneytalks.features.account.data.remote.model.AccountCreateRe
 import com.example.moneytalks.features.account.data.remote.model.AccountUpdateRequestDto
 import com.example.moneytalks.features.account.domain.repository.AccountRepository
 
+/**
+ * Реализация репозитория для работы с аккаунтами через API.
+ */
+
 class AccountRepositoryImpl(
     private val api: AccountApiService
 ): AccountRepository {

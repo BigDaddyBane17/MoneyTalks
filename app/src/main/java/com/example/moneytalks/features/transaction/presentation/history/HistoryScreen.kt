@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.coreui.composable.ListItem
@@ -44,10 +45,9 @@ fun HistoryScreen(
     navController: NavHostController,
     type: String,
     accountId: Int?,
+    viewModel: HistoryViewModel = hiltViewModel(),
 ) {
     val isIncome = type == "доходы"
-
-    val viewModel: HistoryViewModel = hiltViewModel()
 
     // Даты фильтрации
     var startDate by rememberSaveable { mutableStateOf(now().withDayOfMonth(1)) }
@@ -69,7 +69,7 @@ fun HistoryScreen(
         )
     }
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         // Блок выбора дат
@@ -126,15 +126,15 @@ fun HistoryScreen(
                     val outputFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy, HH:mm", Locale("ru"))
                     state.items
                         .sortedBy {
-                            Instant.parse(it.createdAt)
+                            Instant.parse(it.transactionDate)
                         }
                         .forEach { transaction ->
                             val formattedDate = try {
-                                val instant = Instant.parse(transaction.createdAt)
+                                val instant = Instant.parse(transaction.transactionDate)
                                 val dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime()
                                 dateTime.format(outputFormatter)
                             } catch (e: Exception) {
-                                transaction.createdAt
+                                transaction.transactionDate
                             }
                             ListItem(
                                 title = transaction.category.name,

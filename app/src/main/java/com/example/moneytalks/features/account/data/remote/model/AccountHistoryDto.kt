@@ -11,4 +11,3 @@ data class AccountHistoryDto(
     val changeTimestamp: String,
     val createdAt: String
 )
-

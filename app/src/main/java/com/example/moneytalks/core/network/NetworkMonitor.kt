@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
+/**
+ * Монитор сети для отслеживания состояния интернет-соединения в приложении.
+ * Позволяет получать актуальную информацию о наличии подключения к интернету.
+ */
 
 class NetworkMonitor @Inject constructor(context: Context) {
     private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

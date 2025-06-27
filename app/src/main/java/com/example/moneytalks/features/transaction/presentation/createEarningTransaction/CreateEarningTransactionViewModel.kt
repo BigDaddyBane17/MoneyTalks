@@ -1,4 +1,4 @@
-package com.example.moneytalks.features.transaction.presentation.create_spending_transaction
+package com.example.moneytalks.features.transaction.presentation.createEarningTransaction
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -8,11 +8,10 @@ import com.example.moneytalks.features.categories.data.remote.model.CategoryDto
 import com.example.moneytalks.features.transaction.data.remote.model.TransactionRequestDto
 import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.core.network.retryIO
+import com.example.moneytalks.features.account.domain.model.Account
 import com.example.moneytalks.features.account.domain.repository.AccountRepository
 import com.example.moneytalks.features.categories.domain.repository.CategoryRepository
 import com.example.moneytalks.features.transaction.domain.repository.TransactionRepository
-import com.example.moneytalks.features.transaction.presentation.create_earning_transaction.CreateEarningTransactionIntent
-import com.example.moneytalks.features.transaction.presentation.create_earning_transaction.CreateEarningTransactionUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,16 +26,20 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * ViewModel для экрана создания дохода: обработка ввода, валидация и отправка данных.
+ */
+
 @HiltViewModel
-class CreateSpendingTransactionViewModel @Inject constructor(
+class CreateEarningTransactionViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
     private val categoryRepository: CategoryRepository,
     private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<CreateSpendingTransactionUiState>(CreateSpendingTransactionUiState.Loading)
-    val uiState: StateFlow<CreateSpendingTransactionUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<CreateEarningTransactionUiState>(CreateEarningTransactionUiState.Loading)
+    val uiState: StateFlow<CreateEarningTransactionUiState> = _uiState.asStateFlow()
 
     private val _accounts = MutableStateFlow<List<AccountDto>>(emptyList())
     val accounts: StateFlow<List<AccountDto>> = _accounts.asStateFlow()
@@ -58,7 +61,7 @@ class CreateSpendingTransactionViewModel @Inject constructor(
     private fun loadInitialData() {
         viewModelScope.launch {
             if (!networkMonitor.isConnected.value) {
-                _uiState.value = CreateSpendingTransactionUiState.Error("Нет соединения с интернетом")
+                _uiState.value = CreateEarningTransactionUiState.Error("Нет соединения с интернетом")
                 return@launch
             }
             try {
@@ -66,42 +69,42 @@ class CreateSpendingTransactionViewModel @Inject constructor(
                     accountRepository.getAccounts()
                 }
                 val loadedCategories = retryIO(times = 3, delayMillis = 2000){
-                    categoryRepository.getCategoriesByType(isIncome = false)
+                    categoryRepository.getCategoriesByType(isIncome = true)
                 }
                 _accounts.value = loadedAccounts
                 _categories.value = loadedCategories
-                _uiState.value = CreateSpendingTransactionUiState.Data(loadedAccounts, loadedCategories)
+                _uiState.value = CreateEarningTransactionUiState.Data(loadedAccounts, loadedCategories)
             } catch (e: IOException) {
-                _uiState.value = CreateSpendingTransactionUiState.Error("Нет соединения с интернетом")
+                _uiState.value = CreateEarningTransactionUiState.Error("Нет соединения с интернетом")
             } catch (e: Exception) {
-                _uiState.value = CreateSpendingTransactionUiState.Error("Ошибка загрузки: ${e.localizedMessage}")
+                _uiState.value = CreateEarningTransactionUiState.Error("Ошибка загрузки: ${e.localizedMessage}")
             }
         }
     }
 
 
 
-    fun handleIntent(intent: CreateSpendingTransactionIntent) {
+    fun handleIntent(intent: CreateEarningTransactionIntent) {
         when (intent) {
-            is CreateSpendingTransactionIntent.SetAccount -> {
+            is CreateEarningTransactionIntent.SetAccount -> {
                 selectedAccount = _accounts.value.firstOrNull { it.id == intent.id }
             }
-            is CreateSpendingTransactionIntent.SetCategory -> {
+            is CreateEarningTransactionIntent.SetCategory -> {
                 selectedCategory = _categories.value.firstOrNull { it.id == intent.id }
             }
-            is CreateSpendingTransactionIntent.SetAmount -> {
+            is CreateEarningTransactionIntent.SetAmount -> {
                 amount = intent.amount
             }
-            is CreateSpendingTransactionIntent.SetDate -> {
+            is CreateEarningTransactionIntent.SetDate -> {
                 date = intent.date
             }
-            is CreateSpendingTransactionIntent.SetTime -> {
+            is CreateEarningTransactionIntent.SetTime -> {
                 time = intent.time
             }
-            is CreateSpendingTransactionIntent.SetComment -> {
+            is CreateEarningTransactionIntent.SetComment -> {
                 comment = intent.id
             }
-            CreateSpendingTransactionIntent.SubmitTransaction -> {
+            CreateEarningTransactionIntent.SubmitTransaction -> {
                 submit()
             }
         }
@@ -112,7 +115,7 @@ class CreateSpendingTransactionViewModel @Inject constructor(
         val cat = selectedCategory
 
         if (acc == null || cat == null || amount.isBlank() || date.isBlank() || time.isBlank()) {
-            _uiState.value = CreateSpendingTransactionUiState.Error("Заполните все обязательные поля")
+            _uiState.value = CreateEarningTransactionUiState.Error("Заполните все обязательные поля")
             return
         }
 
@@ -123,18 +126,18 @@ class CreateSpendingTransactionViewModel @Inject constructor(
             localDateTime.atZone(ZoneOffset.UTC)
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
         } catch (e: Exception) {
-            _uiState.value = CreateSpendingTransactionUiState.Error("Некорректная дата или время")
+            _uiState.value = CreateEarningTransactionUiState.Error("Некорректная дата или время")
             return
         }
 
         val amountString = amount.toDoubleOrNull()?.let { String.format(Locale.US, "%.2f", it) } ?: run {
-            _uiState.value = CreateSpendingTransactionUiState.Error("Некорректная сумма")
+            _uiState.value = CreateEarningTransactionUiState.Error("Некорректная сумма")
             return
         }
 
         val commentToSend = if (comment.isBlank()) null else comment
 
-        _uiState.value = CreateSpendingTransactionUiState.Loading
+        _uiState.value = CreateEarningTransactionUiState.Loading
         viewModelScope.launch {
             try {
                 val request = TransactionRequestDto(
@@ -148,9 +151,9 @@ class CreateSpendingTransactionViewModel @Inject constructor(
                 retryIO(times = 3, delayMillis = 2000) {
                     transactionRepository.createTransaction(request)
                 }
-                _uiState.value = CreateSpendingTransactionUiState.Success
+                _uiState.value = CreateEarningTransactionUiState.Success
             } catch (e: Exception) {
-                _uiState.value = CreateSpendingTransactionUiState.Error("Ошибка при создании: ${e.localizedMessage}")
+                _uiState.value = CreateEarningTransactionUiState.Error("Ошибка при создании: ${e.localizedMessage}")
             }
         }
 
@@ -164,7 +167,7 @@ class CreateSpendingTransactionViewModel @Inject constructor(
         time = ""
         comment = ""
 
-        _uiState.value = CreateSpendingTransactionUiState.Loading
+        _uiState.value = CreateEarningTransactionUiState.Loading
         loadInitialData()
     }
 

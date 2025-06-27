@@ -1,4 +1,4 @@
-package com.example.moneytalks.features.categories.presentation.item_expenses
+package com.example.moneytalks.features.categories.presentation.category
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.moneytalks.coreui.composable.ListItem
@@ -28,42 +29,42 @@ import com.example.moneytalks.coreui.composable.SearchBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemExpensesScreen(
-    viewModel: ItemExpensesViewModel = viewModel(),
+fun CategoryScreen(
+    viewModel: CategoryViewModel = viewModel(),
     navController: NavHostController
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var searchQuery by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        viewModel.handleIntent(ItemExpensesIntent.LoadItemExpenses)
+        viewModel.handleIntent(CategoryIntent.LoadCategory)
     }
 
 
     when (uiState) {
-        is ItemExpenseUiState.Loading -> {
+        is CategoryUiState.Loading -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
 
-        is ItemExpenseUiState.Success -> {
-            val expenses = (uiState as ItemExpenseUiState.Success).items
+        is CategoryUiState.Success -> {
+            val expenses = (uiState as CategoryUiState.Success).items
 
 
             Column {
                 SearchBar(
                     onSearch = { query ->
                         searchQuery = query
-                        viewModel.handleIntent(ItemExpensesIntent.SearchItemExpenses(query))
+                        viewModel.handleIntent(CategoryIntent.SearchCategory(query))
                     }
                 )
 
                 LazyColumn {
                     itemsIndexed(expenses) { _, item ->
                         ListItem(
-                            title = item.title,
-                            leadingIcon = item.leadIcon,
+                            title = item.name,
+                            leadingIcon = item.emoji,
                             contentPadding = PaddingValues(
                                 horizontal = 16.dp,
                                 vertical = 20.dp
@@ -76,15 +77,13 @@ fun ItemExpensesScreen(
             }
         }
 
-        is ItemExpenseUiState.Error -> {
+        is CategoryUiState.Error -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = (uiState as ItemExpenseUiState.Error).message,
+                    text = (uiState as CategoryUiState.Error).message,
                     color = Color.Red
                 )
             }
         }
     }
 }
-
-

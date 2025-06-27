@@ -14,6 +14,10 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
+/**
+ * ViewModel для загрузки и отображения списка транзакций, а также обработки пользовательских действий.
+ */
+
 
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
@@ -67,5 +71,3 @@ class TransactionViewModel @Inject constructor(
 
 
 }
-
-

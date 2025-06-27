@@ -1,4 +1,5 @@
 package com.example.moneytalks
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,97 +18,109 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.coreui.TopAppBarState
 import com.example.moneytalks.coreui.composable.TopBar
-import com.example.moneytalks.features.transaction.presentation.create_spending_transaction.CreateSpendingTransactionIntent
-import com.example.moneytalks.features.transaction.presentation.create_spending_transaction.CreateSpendingTransactionViewModel
+import com.example.moneytalks.features.transaction.presentation.createSpendingTransaction.CreateSpendingTransactionIntent
+import com.example.moneytalks.features.transaction.presentation.createSpendingTransaction.CreateSpendingTransactionViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.moneytalks.core.network.NetworkMonitorViewModel
 import com.example.moneytalks.features.account.presentation.account.AccountViewModel
-import com.example.moneytalks.features.transaction.presentation.create_earning_transaction.CreateEarningTransactionIntent
-import com.example.moneytalks.features.transaction.presentation.create_earning_transaction.CreateEarningTransactionViewModel
+import com.example.moneytalks.features.transaction.presentation.createEarningTransaction.CreateEarningTransactionIntent
+import com.example.moneytalks.features.transaction.presentation.createEarningTransaction.CreateEarningTransactionViewModel
 import com.example.moneytalks.features.transaction.presentation.transactions.TransactionViewModel
 import com.example.moneytalks.navigation.MainNavHost
+import com.example.moneytalks.navigation.Routes
 import com.example.moneytalks.navigation.items
 
+/**
+ * Основной экран приложения.
+ *
+ * Включает верхний топ-бар, нижнюю навигацию, fab-кнопку и основной NavHost.
+ * Управляет глобальными состояниями:
+ *  - текущий выбранный счет
+ *  - статус сети
+ *  - выбранная вкладка навигации
+ *
+ * Особенности:
+ * - Реагирует на изменение состояния сети, выводит предупреждение о потере соединения.
+ * - Позволяет выбрать активный счет из выпадающего меню в топ-баре.
+ * - FAB-кнопка динамически меняется в зависимости от текущей вкладки.
+ * - Передаёт необходимые параметры (selectedAccountId, accountViewModel) во внутренний NavHost.
+ *
+ *
+ * @see TopBar — верхняя панель с динамическими кнопками и меню выбора счета.
+ * @see NavigationBar — нижняя навигация по основным разделам.
+ * @see FloatingActionButton — кнопка для добавления транзакций или счета.
+ * @see MainNavHost — основной граф навигации приложения.
+ */
 
 @Composable
 fun MainAppScreen() {
-
-    val context = LocalContext.current.applicationContext
-    val networkMonitor = remember { NetworkMonitor(context) }
-
-    LaunchedEffect(Unit) { networkMonitor.start() }
-    DisposableEffect(Unit) { onDispose { networkMonitor.stop() } }
-
-    val isConnected by networkMonitor.isConnected.collectAsState()
-
+    val networkMonitorViewModel: NetworkMonitorViewModel = hiltViewModel()
+    val isConnected by networkMonitorViewModel.networkMonitor.isConnected.collectAsStateWithLifecycle()
 
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
-    val spendingViewModel: CreateSpendingTransactionViewModel = hiltViewModel()
-    val earningViewModel: CreateEarningTransactionViewModel = hiltViewModel()
+    val transactionEarningViewModel: TransactionViewModel = hiltViewModel(
+        key = "earn"
+    )
 
     val transactionSpendingViewModel: TransactionViewModel = hiltViewModel(
-        key = "spendings"
+        key = "spend"
     )
-    val transactionEarningViewModel: TransactionViewModel = hiltViewModel(
-        key = "earnings"
-    )
-
-
+    val spendingViewModel: CreateSpendingTransactionViewModel = hiltViewModel()
+    val earningViewModel: CreateEarningTransactionViewModel = hiltViewModel()
     val accountViewModel: AccountViewModel = hiltViewModel()
 
-    val accounts by accountViewModel.accounts.collectAsState()
-    val selectedAccountId by accountViewModel.selectedAccountId.collectAsState()
+    val accounts by accountViewModel.accounts.collectAsStateWithLifecycle()
+    val selectedAccountId by accountViewModel.selectedAccountId.collectAsStateWithLifecycle()
 
     var showAccountMenu by remember { mutableStateOf(false) }
 
     val tabRoutes = listOf(
-        "расходы_граф", "доходы_граф", "счет_граф", "статьи_граф", "настройки_граф"
+        Routes.EXPENSES_GRAPH, Routes.EARNINGS_GRAPH, Routes.ACCOUNTS_GRAPH, Routes.CATEGORIES_GRAPH, Routes.SETTINGS_GRAPH
     )
 
     val selectedTab = tabRoutes.indexOfFirst {
         currentRoute?.startsWith(it.removeSuffix("_граф")) == true
     }.let { if (it == -1) 0 else it }
 
-
     val topAppBarState = remember(currentBackStackEntry) {
         when (currentBackStackEntry?.destination?.route) {
+
             // Граф "Расходы"
-            "расходы" -> TopAppBarState(
+            Routes.EXPENSES -> TopAppBarState(
                 title = "Расходы сегодня",
                 trailingIcon = R.drawable.clocks,
                 onTrailingIconClick = {
-                    navController.navigate("расходы_история")
+                    navController.navigate(Routes.EXPENSES_HISTORY)
                 }
             )
-            "расходы_история" -> TopAppBarState(
+            Routes.EXPENSES_HISTORY -> TopAppBarState(
                 title = "Моя история",
                 leadingIcon = R.drawable.back,
                 trailingIcon = R.drawable.history,
                 onLeadingIconClick = { navController.popBackStack() },
-                onTrailingIconClick = { navController.navigate("расходы_анализ") }
+                onTrailingIconClick = { navController.navigate(Routes.EXPENSES_ANALYSIS) }
             )
-            "расходы_добавить" -> TopAppBarState(
+            Routes.EXPENSES_ADD -> TopAppBarState(
                 title = "Мои расходы",
                 leadingIcon = R.drawable.back,
                 trailingIcon = R.drawable.ok,
@@ -116,28 +129,28 @@ fun MainAppScreen() {
                     spendingViewModel.handleIntent(CreateSpendingTransactionIntent.SubmitTransaction)
                 }
             )
-            "расходы_анализ" -> TopAppBarState(
+            Routes.EXPENSES_ANALYSIS -> TopAppBarState(
                 title = "Анализ расходов",
                 leadingIcon = R.drawable.back,
                 onLeadingIconClick = { navController.popBackStack() }
             )
 
             // Граф "Доходы"
-            "доходы" -> TopAppBarState(
+            Routes.EARNINGS -> TopAppBarState(
                 title = "Доходы сегодня",
                 trailingIcon = R.drawable.clocks,
                 onTrailingIconClick = {
-                    navController.navigate("доходы_история")
+                    navController.navigate(Routes.EARNINGS_HISTORY)
                 }
             )
-            "доходы_история" -> TopAppBarState(
+            Routes.EARNINGS_HISTORY -> TopAppBarState(
                 title = "История доходов",
                 leadingIcon = R.drawable.back,
                 trailingIcon = R.drawable.history,
                 onLeadingIconClick = { navController.popBackStack() },
-                onTrailingIconClick = { navController.navigate("доходы_анализ") }
+                onTrailingIconClick = { navController.navigate(Routes.EARNINGS_ANALYSIS) }
             )
-            "доходы_добавить" -> TopAppBarState(
+            Routes.EARNINGS_ADD -> TopAppBarState(
                 title = "Мои доходы",
                 leadingIcon = R.drawable.back,
                 trailingIcon = R.drawable.ok,
@@ -146,48 +159,48 @@ fun MainAppScreen() {
                     earningViewModel.handleIntent(CreateEarningTransactionIntent.SubmitTransaction)
                 }
             )
-            "доходы_анализ" -> TopAppBarState(
+            Routes.EARNINGS_ANALYSIS -> TopAppBarState(
                 title = "Анализ доходов",
                 leadingIcon = R.drawable.back,
                 onLeadingIconClick = { navController.popBackStack() }
             )
 
             // Граф "Счет"
-            "счет" -> TopAppBarState(
+            Routes.ACCOUNT -> TopAppBarState(
                 title = "Мои счета",
                 leadingIcon = R.drawable.choose_account,
                 onLeadingIconClick = {
                     showAccountMenu = true
                 },
                 trailingIcon = R.drawable.pen,
-                onTrailingIconClick = { navController.navigate("счет_редактировать") }
+                onTrailingIconClick = { navController.navigate(Routes.ACCOUNT_EDIT) }
             )
-            "счет_добавить" -> TopAppBarState(
+            Routes.ACCOUNT_ADD -> TopAppBarState(
                 title = "Мой счет",
                 leadingIcon = R.drawable.cancel,
                 onLeadingIconClick = { navController.popBackStack() },
                 trailingIcon = R.drawable.ok,
                 onTrailingIconClick = {
-
+                    // TODO: add submit logic
                 }
             )
-            "счет_редактировать" -> TopAppBarState(
+            Routes.ACCOUNT_EDIT -> TopAppBarState(
                 title = "Мой счет",
                 leadingIcon = R.drawable.cancel,
                 onLeadingIconClick = { navController.popBackStack() },
                 trailingIcon = R.drawable.ok,
                 onTrailingIconClick = {
-
+                    // TODO: add submit logic
                 }
             )
 
             // Граф "Статьи"
-            "статьи" -> TopAppBarState(
+            Routes.CATEGORIES -> TopAppBarState(
                 title = "Статьи расходов",
             )
 
             // Граф "Настройки"
-            "настройки" -> TopAppBarState(
+            Routes.SETTINGS -> TopAppBarState(
                 title = "Настройки"
             )
 
@@ -196,7 +209,12 @@ fun MainAppScreen() {
     }
 
     if (!isConnected) {
-        Box(Modifier.fillMaxWidth().background(Color.Red)) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .background(Color.Red),
+            Alignment.Center
+        ) {
             Text(
                 "Нет соединения с интернетом",
                 color = Color.White,
@@ -216,6 +234,7 @@ fun MainAppScreen() {
                     onDismissRequest = { showAccountMenu = false }
                 ) {
                     accounts.forEach { account ->
+                        Log.d("accs", "${account.name}")
                         DropdownMenuItem(
                             text = { Text(account.name) },
                             onClick = {
@@ -265,23 +284,24 @@ fun MainAppScreen() {
             }
         },
         floatingActionButton = {
-            if (currentRoute == "расходы" ||
-                currentRoute == "доходы" ||
-                currentRoute == "счет"
+            if (
+                currentRoute == Routes.EXPENSES ||
+                currentRoute == Routes.EARNINGS ||
+                currentRoute == Routes.ACCOUNT
             ) {
                 FloatingActionButton(
                     onClick = {
                         when {
-                            currentRoute.startsWith("расходы") == true -> {
+                            currentRoute == Routes.EXPENSES -> {
                                 spendingViewModel.reset()
-                                navController.navigate("расходы_добавить")
+                                navController.navigate(Routes.EXPENSES_ADD)
                             }
-                            currentRoute.startsWith("доходы") == true -> {
+                            currentRoute == Routes.EARNINGS -> {
                                 earningViewModel.reset()
-                                navController.navigate("доходы_добавить")
+                                navController.navigate(Routes.EARNINGS_ADD)
                             }
-                            currentRoute.startsWith("счет") == true -> {
-                                navController.navigate("счет_добавить")
+                            currentRoute == Routes.ACCOUNT -> {
+                                navController.navigate(Routes.ACCOUNT_ADD)
                             }
                         }
                     },
@@ -299,12 +319,12 @@ fun MainAppScreen() {
             navController = navController,
             modifier = Modifier.padding(padding),
             selectedAccountId = selectedAccountId,
-            earningViewModel = earningViewModel,
-            spendingViewModel = spendingViewModel,
             accountViewModel = accountViewModel,
             transactionSpendingViewModel = transactionSpendingViewModel,
             transactionEarningViewModel = transactionEarningViewModel,
-            networkMonitor = networkMonitor
+            spendingViewModel = spendingViewModel,
+            earningViewModel = earningViewModel,
         )
     }
 }
+

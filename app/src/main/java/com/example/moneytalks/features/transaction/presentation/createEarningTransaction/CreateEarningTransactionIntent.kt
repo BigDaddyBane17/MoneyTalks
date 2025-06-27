@@ -1,4 +1,4 @@
-package com.example.moneytalks.features.transaction.presentation.create_earning_transaction
+package com.example.moneytalks.features.transaction.presentation.createEarningTransaction
 
 sealed class CreateEarningTransactionIntent {
     object SubmitTransaction: CreateEarningTransactionIntent()

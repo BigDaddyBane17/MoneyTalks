@@ -38,7 +38,7 @@ fun ListItem(
     subtitle: String? = null,
     trailingIcon: Int? = null,
     contentPadding: PaddingValues = PaddingValues(vertical = 24.dp, horizontal = 16.dp),
-    backgroundColor: Color = Color(0xFFFeF7FF),
+    backgroundColor: Color = Color(0xFFFeF7FF), //исправить
     trailingComposable: @Composable (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
