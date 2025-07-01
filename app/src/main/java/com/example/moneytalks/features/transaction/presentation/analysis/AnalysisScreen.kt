@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun AnalysisScreen(
-    navController: NavHostController,
     type: String
 ) {
 

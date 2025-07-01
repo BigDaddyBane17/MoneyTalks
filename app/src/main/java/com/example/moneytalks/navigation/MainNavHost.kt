@@ -24,46 +24,49 @@ import com.example.moneytalks.features.transaction.presentation.transactions.Tra
 @Composable
 fun MainNavHost(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
     startDestination: String = Routes.EXPENSES_GRAPH,
     selectedAccountId: Int?,
     accountViewModel: AccountViewModel,
-    transactionSpendingViewModel: TransactionViewModel,
-    transactionEarningViewModel: TransactionViewModel,
-    spendingViewModel: CreateSpendingTransactionViewModel,
-    earningViewModel: CreateEarningTransactionViewModel,
+
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier
     ) {
         // Граф "Расходы"
         navigation(startDestination = Routes.EXPENSES, route = Routes.EXPENSES_GRAPH) {
             composable(Routes.EXPENSES) {
                 TransactionScreen(
-                    navController = navController,
                     accountId = selectedAccountId,
-                    viewModel = transactionSpendingViewModel,
-                    type = Routes.EXPENSES
+                    type = Routes.EXPENSES,
+                    navigateToHistory = {
+                        navController.navigate(Routes.EXPENSES_HISTORY)
+                    },
+                    navigateToAddTransaction = {
+                        navController.navigate(Routes.EXPENSES_ADD)
+                    },
+
                 )
             }
             composable(Routes.EXPENSES_HISTORY) {
                 HistoryScreen(
-                    navController = navController,
                     type = Routes.EXPENSES,
-                    accountId = selectedAccountId
+                    accountId = selectedAccountId,
+                    navigateToAnalysis = {
+                        navController.navigate(Routes.EXPENSES_ANALYSIS)
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
             composable(Routes.EXPENSES_ADD) {
                 CreateSpendingTransactionScreen(
                     navController = navController,
-                    viewModel = spendingViewModel
                 )
             }
             composable(Routes.EXPENSES_ANALYSIS) {
                 AnalysisScreen(
-                    navController = navController,
                     type = Routes.EXPENSES
                 )
             }
@@ -73,28 +76,37 @@ fun MainNavHost(
         navigation(startDestination = Routes.EARNINGS, route = Routes.EARNINGS_GRAPH) {
             composable(Routes.EARNINGS) {
                 TransactionScreen(
-                    navController = navController,
                     accountId = selectedAccountId,
-                    viewModel = transactionEarningViewModel,
-                    type = Routes.EARNINGS
+                    type = Routes.EARNINGS,
+                    navigateToHistory = {
+                        navController.navigate(Routes.EARNINGS_HISTORY)
+                    },
+                    navigateToAddTransaction = {
+                        navController.navigate(Routes.EARNINGS_ADD)
+                    },
+
+
                 )
             }
             composable(Routes.EARNINGS_HISTORY) {
                 HistoryScreen(
-                    navController = navController,
                     type = Routes.EARNINGS,
-                    accountId = selectedAccountId
+                    accountId = selectedAccountId,
+                    navigateToAnalysis = {
+                        navController.navigate(Routes.EARNINGS_ANALYSIS)
+                    },
+                    navigateBack = {
+                        navController.popBackStack()
+                    }
                 )
             }
             composable(Routes.EARNINGS_ADD) {
                 CreateEarningTransactionScreen(
-                    navController = navController,
-                    viewModel = earningViewModel
+                    navigateBack = { navController.popBackStack() }
                 )
             }
             composable(Routes.EARNINGS_ANALYSIS) {
                 AnalysisScreen(
-                    navController = navController,
                     type = Routes.EARNINGS
                 )
             }
@@ -104,29 +116,31 @@ fun MainNavHost(
         navigation(startDestination = Routes.ACCOUNT, route = Routes.ACCOUNTS_GRAPH) {
             composable(Routes.ACCOUNT) {
                 AccountScreen(
-                    navController = navController,
-                    viewModel = accountViewModel
+                    viewModel = accountViewModel,
+                    navigateToAccountEdit = {
+                        navController.navigate(Routes.ACCOUNT_EDIT)
+                    }
                 )
             }
             composable(Routes.ACCOUNT_ADD) {
-                CreateAccount(navController = navController)
+                CreateAccount()
             }
             composable(Routes.ACCOUNT_EDIT) {
-                EditAccountScreen(navController = navController)
+                EditAccountScreen()
             }
         }
 
         // Граф "Статьи"
         navigation(startDestination = Routes.CATEGORIES, route = Routes.CATEGORIES_GRAPH) {
             composable(Routes.CATEGORIES) {
-                CategoryScreen(navController = navController)
+                CategoryScreen()
             }
         }
 
         // Граф "Настройки"
         navigation(startDestination = Routes.SETTINGS, route = Routes.SETTINGS_GRAPH) {
             composable(Routes.SETTINGS) {
-                SettingsScreen(navController = navController)
+                SettingsScreen()
             }
         }
     }

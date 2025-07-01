@@ -1,12 +1,10 @@
 package com.example.moneytalks.features.account.presentation.account
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.features.account.data.remote.model.AccountDto
 import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.core.network.retryIO
-import com.example.moneytalks.features.account.domain.model.Account
 import com.example.moneytalks.features.account.domain.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
