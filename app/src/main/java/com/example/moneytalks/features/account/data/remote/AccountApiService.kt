@@ -13,16 +13,17 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface AccountApiService {
+
     @GET("accounts")
     suspend fun getAccounts(): List<AccountDto>
 
     @POST("accounts")
     suspend fun createAccount(@Body request: AccountCreateRequestDto): AccountDto
 
-    @GET("account/{id}")
+    @GET("accounts/{id}")
     suspend fun getAccountById(@Path("id") id: Int): AccountResponseDto
 
-    @PUT("account/{id}")
+    @PUT("accounts/{id}")
     suspend fun updateAccountById(
         @Path("id") id: Int,
         @Body request: AccountUpdateRequestDto

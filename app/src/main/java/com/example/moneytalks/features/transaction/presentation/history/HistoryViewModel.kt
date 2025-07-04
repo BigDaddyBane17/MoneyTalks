@@ -50,7 +50,7 @@ class HistoryViewModel @Inject constructor(
                     }
                 }
                 val total = historyList.sumOf { it.amount.toDouble() }
-                _uiState.value = HistoryUiState.Success(historyList, "%,.2f ₽".format(total))
+                _uiState.value = HistoryUiState.Success(historyList, "%,.2f".format(total))
             }
             catch (e: IOException) {
                 _uiState.value = HistoryUiState.Error("Нет соединения с интернетом")

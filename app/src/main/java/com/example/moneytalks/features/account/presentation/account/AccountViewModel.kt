@@ -6,12 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.features.account.data.remote.model.AccountDto
 import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.core.network.retryIO
-import com.example.moneytalks.features.account.domain.model.Account
+import com.example.moneytalks.features.account.data.remote.model.AccountUpdateRequestDto
 import com.example.moneytalks.features.account.domain.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
@@ -19,6 +20,9 @@ import javax.inject.Inject
 /**
  * ViewModel для получения, выбора и отображения счеирв, а также обработки состояния загрузки/ошибок.
  */
+
+
+//todo убрать логику репозитория отсюда
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
@@ -29,9 +33,12 @@ class AccountViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<AccountUiState>(AccountUiState.Loading)
     val uiState: StateFlow<AccountUiState> = _uiState.asStateFlow()
 
-
     private val _accounts = MutableStateFlow<List<AccountDto>>(emptyList())
     val accounts: StateFlow<List<AccountDto>> = _accounts.asStateFlow()
+
+    private val _selectedAccount = MutableStateFlow<AccountDto?>(null)
+    val selectedAccount: StateFlow<AccountDto?> = _selectedAccount.asStateFlow()
+
 
     private val _selectedAccountId = MutableStateFlow<Int?>(null)
     val selectedAccountId: StateFlow<Int?> = _selectedAccountId.asStateFlow()
@@ -45,10 +52,6 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    init {
-        loadAccounts()
-    }
-
     fun loadAccounts() {
         viewModelScope.launch {
             if (!networkMonitor.isConnected.value) {
@@ -56,7 +59,7 @@ class AccountViewModel @Inject constructor(
                 return@launch
             }
             try {
-                val loadedAccounts = retryIO(times = 3, delayMillis = 2000){
+                val loadedAccounts = retryIO(times = 3, delayMillis = 2000) {
                     repository.getAccounts()
                 }
                 _accounts.value = loadedAccounts
@@ -68,6 +71,7 @@ class AccountViewModel @Inject constructor(
                 val selected = loadedAccounts.firstOrNull { it.id == _selectedAccountId.value }
                     ?: loadedAccounts.firstOrNull()
 
+                _selectedAccount.value = selected
                 _uiState.value = AccountUiState.Success(selected)
             } catch (e: IOException) {
                 _uiState.value = AccountUiState.Error("Нет соединения с интернетом")
@@ -81,19 +85,26 @@ class AccountViewModel @Inject constructor(
     fun selectAccount(accountId: Int) {
         _selectedAccountId.value = accountId
         val selected = _accounts.value.firstOrNull { it.id == accountId }
+        _selectedAccount.value = selected
         _uiState.value = AccountUiState.Success(selected)
     }
 
-    private fun changeCurrency(currency: String) {
-//        _uiState.update { oldState ->
-//            if(oldState is AccountUiState.Success) {
-//                oldState.copy(account = oldState.account?.copy(currency = currency))
-//            }
-//            else {
-//                oldState
-//            }
-//        }
+    fun changeCurrency(newCurrency: String) {
+        val current = _selectedAccount.value ?: return
+        viewModelScope.launch {
+            try {
+                val request = AccountUpdateRequestDto(
+                    name = current.name,
+                    balance = current.balance,
+                    currency = newCurrency
+                )
+                val updatedAccount = repository.updateAccount(current.id, request)
+                _selectedAccount.value = updatedAccount
+                _uiState.value = AccountUiState.Success(updatedAccount)
+            } catch (e: Exception) {
+                _uiState.value = AccountUiState.Error("Ошибка обновления валюты: ${e.localizedMessage}")
+            }
+        }
     }
-
 
 }

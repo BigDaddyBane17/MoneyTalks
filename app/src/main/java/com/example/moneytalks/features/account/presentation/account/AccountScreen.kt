@@ -1,5 +1,6 @@
 package com.example.moneytalks.features.account.presentation.account
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -13,12 +14,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,18 +45,33 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.coreui.composable.ListItem
+import com.example.moneytalks.features.transaction.presentation.createEarningTransaction.CreateEarningTransactionIntent.SubmitTransaction
+import com.example.moneytalks.navigation.Routes
+
+data class CurrencyItem(
+    val name: String,
+    val iconRes: Int,
+    val code: String,
+    val symbol: String
+)
+
+val currencies = listOf(
+    CurrencyItem("Российский рубль", R.drawable.mdi_ruble, "RUB", "₽"),
+    CurrencyItem("Американский доллар", R.drawable.mdi_dollar, "USD", "$"),
+    CurrencyItem("Евро", R.drawable.mdi_euro, "EUR", "€"),
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
-    navController: NavHostController,
     viewModel: AccountViewModel,
+    navigateToAccountEdit: () -> Unit,
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
-
+    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
+    var showAccountMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.handleIntent(AccountIntent.LoadAccountData)
@@ -58,7 +81,7 @@ fun AccountScreen(
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
             sheetState = sheetState,
-            containerColor = Color(0xFFF7F2FA)
+            containerColor = MaterialTheme.colorScheme.background
         ) {
             Column {
                 currencies.forEachIndexed { index, currency ->
@@ -67,11 +90,7 @@ fun AccountScreen(
                             .fillMaxWidth()
                             .clickable {
                                 showSheet = false
-                                viewModel.handleIntent(AccountIntent.CurrencyClick(
-                                    if (currency.name == "Российский рубль") "₽"
-                                    else if (currency.name == "Американский доллар") "$"
-                                    else "€"
-                                ))
+                                viewModel.handleIntent(AccountIntent.CurrencyClick(currency.code))
                             }
                             .padding(horizontal = 16.dp)
                             .height(72.dp),
@@ -119,83 +138,98 @@ fun AccountScreen(
         }
     }
 
+    Scaffold(
+        topBar = {
+            Box {
+                CenterAlignedTopAppBar(
+                    title = { Text("Мои счета") },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            showAccountMenu = true
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.choose_account),
+                                contentDescription = "Выбор аккаунта"
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = navigateToAccountEdit) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.pen),
+                                contentDescription = "Редактировать счет",
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ),
+                )
+                DropdownMenu(
+                    expanded = showAccountMenu,
+                    onDismissRequest = { showAccountMenu = false }
+                ) {
+                    accounts.forEach { account ->
+                        Log.d("accs", account.name)
+                        DropdownMenuItem(
+                            text = { Text(account.name) },
+                            onClick = {
+                                viewModel.selectAccount(account.id)
+                                showAccountMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { innerPadding ->
+        when (uiState) {
+            is AccountUiState.Loading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            is AccountUiState.Success -> {
+                val state = uiState as AccountUiState.Success
 
-    when (uiState) {
-        is AccountUiState.Loading -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+                val currencySymbol = currencies.firstOrNull { it.code == state.account?.currency }?.symbol
+                    ?: state.account?.currency.orEmpty()
+
+                Column(
+                    Modifier.padding(innerPadding)
+                ) {
+                    ListItem(
+                        title = "Баланс",
+                        amount = state.account?.balance,
+                        currency = currencySymbol,
+                        backgroundColor = MaterialTheme.colorScheme.surface,
+                        contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+                        leadingIcon = "\uD83D\uDCB0",
+                        modifier = Modifier.height(56.dp)
+                    )
+                    HorizontalDivider()
+                    ListItem(
+                        title = "Валюта",
+                        amount = currencySymbol,
+                        backgroundColor = MaterialTheme.colorScheme.surface,
+                        contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
+                        trailingIcon = R.drawable.more_vert,
+                        onClick = {
+                            showSheet = true
+                        },
+                        modifier = Modifier.height(56.dp)
+                    )
+                }
+            }
+            is AccountUiState.Error -> {
+                Text(
+                    text = (uiState as AccountUiState.Error).message,
+                    color = Color.Red,
+                    modifier = Modifier
+                        .padding(16.dp)
+                )
             }
         }
-
-        is AccountUiState.Success -> {
-            val state = uiState as AccountUiState.Success
-
-            Column {
-                ListItem(
-                    title = "Баланс",
-                    amount = state.account?.balance,
-                    currency =
-                        if(state.account?.currency == "EUR") {
-                            "€"
-                        }
-                        else if (state.account?.currency == "USD") {
-                            "$"
-                        }
-                        else {
-                            "₽"
-                        },
-                    backgroundColor = Color(0xFFD4FAE6),
-                    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
-                    trailingIcon = R.drawable.more_vert,
-                    onClick = {
-                        navController.navigate("счет_редактировать")
-                    },
-                    leadingIcon = "\uD83D\uDCB0",
-                    modifier = Modifier.height(56.dp)
-                )
-                HorizontalDivider()
-                ListItem(
-                    title = "Валюта",
-                    amount =
-                        if(state.account?.currency == "EUR") {
-                            "€"
-                        }
-                        else if (state.account?.currency == "USD") {
-                            "$"
-                        }
-                        else {
-                            "₽"
-                        },
-                    backgroundColor = Color(0xFFD4FAE6),
-                    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
-                    trailingIcon = R.drawable.more_vert,
-                    onClick = {
-                        showSheet = true
-                    },
-                    modifier = Modifier.height(56.dp)
-                )
-            }
-        }
-
-        is AccountUiState.Error -> {
-            Text(
-                text = (uiState as AccountUiState.Error).message,
-                color = Color.Red,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-
     }
 }
-
-
-data class CurrencyItem(
-    val name: String,
-    val iconRes: Int
-)
-
-val currencies = listOf(
-    CurrencyItem("Российский рубль", R.drawable.mdi_ruble),
-    CurrencyItem("Американский доллар", R.drawable.mdi_dollar),
-    CurrencyItem("Евро", R.drawable.mdi_euro),
-)

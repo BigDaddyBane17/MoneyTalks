@@ -5,9 +5,6 @@ import android.content.Context
 import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.core.network.AuthInterceptor
 
-import com.example.moneytalks.features.account.data.remote.AccountApiService
-import com.example.moneytalks.features.categories.data.remote.CategoryApiService
-import com.example.moneytalks.features.transaction.data.remote.TransactionApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

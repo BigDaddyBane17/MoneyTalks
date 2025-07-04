@@ -7,8 +7,7 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun CreateAccount(
-    navController: NavHostController,
-    modifier: Modifier = Modifier
+
 ) {
 
     Text(
