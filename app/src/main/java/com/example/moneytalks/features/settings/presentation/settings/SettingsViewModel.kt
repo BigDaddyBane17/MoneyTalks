@@ -1,6 +1,8 @@
 package com.example.moneytalks.features.settings.presentation.settings
 
 import androidx.lifecycle.ViewModel
+import com.example.moneytalks.core.network.NetworkMonitor
+import com.example.moneytalks.features.categories.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,7 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
  * ViewModel для управления состоянием экрана настроек приложения.
  */
 
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel(
+) : ViewModel() {
     private val _uiState = MutableStateFlow<SettingsUiState>(SettingsUiState.Loading)
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 

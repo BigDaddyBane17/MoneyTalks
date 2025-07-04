@@ -27,11 +27,12 @@ fun MainNavHost(
     startDestination: String = Routes.EXPENSES_GRAPH,
     selectedAccountId: Int?,
     accountViewModel: AccountViewModel,
-
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
+        modifier = modifier
     ) {
         // Граф "Расходы"
         navigation(startDestination = Routes.EXPENSES, route = Routes.EXPENSES_GRAPH) {
@@ -45,6 +46,7 @@ fun MainNavHost(
                     navigateToAddTransaction = {
                         navController.navigate(Routes.EXPENSES_ADD)
                     },
+                    accountViewModel = accountViewModel
 
                 )
             }
@@ -57,7 +59,8 @@ fun MainNavHost(
                     },
                     navigateBack = {
                         navController.popBackStack()
-                    }
+                    },
+                    accountViewModel = accountViewModel
                 )
             }
             composable(Routes.EXPENSES_ADD) {
@@ -84,7 +87,7 @@ fun MainNavHost(
                     navigateToAddTransaction = {
                         navController.navigate(Routes.EARNINGS_ADD)
                     },
-
+                    accountViewModel = accountViewModel
 
                 )
             }
@@ -97,7 +100,8 @@ fun MainNavHost(
                     },
                     navigateBack = {
                         navController.popBackStack()
-                    }
+                    },
+                    accountViewModel = accountViewModel
                 )
             }
             composable(Routes.EARNINGS_ADD) {

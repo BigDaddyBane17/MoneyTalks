@@ -3,7 +3,10 @@ package com.example.moneytalks.features.categories.presentation.category
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -26,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -35,14 +39,9 @@ import com.example.moneytalks.coreui.composable.SearchBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
-    viewModel: CategoryViewModel = viewModel(),
+    viewModel: CategoryViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var searchQuery by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        viewModel.handleIntent(CategoryIntent.LoadCategory)
-    }
 
 
     Scaffold(
@@ -67,32 +66,33 @@ fun CategoryScreen(
                 val expenses = (uiState as CategoryUiState.Success).items
 
 
-                Column(
-                    Modifier.padding(innerPadding)
-                ) {
-                    SearchBar(
-                        onSearch = { query ->
-                            searchQuery = query
-                            viewModel.handleIntent(CategoryIntent.SearchCategory(query))
-                        }
-                    )
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = innerPadding
+                ){
+                    item {
+                        SearchBar(
+                            onSearch = { q ->
+                                viewModel.handleIntent(CategoryIntent.SearchCategory(q))
+                            }
+                        )
+                    }
 
-                    LazyColumn {
-                        itemsIndexed(expenses) { _, item ->
-                            ListItem(
-                                title = item.name,
-                                leadingIcon = item.emoji,
-                                contentPadding = PaddingValues(
-                                    horizontal = 16.dp,
-                                    vertical = 20.dp
-                                ),
-                                modifier = Modifier
-                            )
-                            HorizontalDivider()
-                        }
+                    itemsIndexed(expenses) { _, item ->
+                        ListItem(
+                            title = item.name,
+                            leadingIcon = item.emoji,
+                            contentPadding = PaddingValues(
+                                horizontal = 16.dp,
+                                vertical = 20.dp
+                            ),
+                            modifier = Modifier
+                        )
+                        HorizontalDivider()
                     }
                 }
             }
+
 
             is CategoryUiState.Error -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

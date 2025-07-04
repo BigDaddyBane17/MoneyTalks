@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.coreui.composable.ListItem
+import com.example.moneytalks.features.account.presentation.account.AccountViewModel
 import com.example.moneytalks.navigation.Routes
 import java.time.LocalDate
 
@@ -49,11 +50,20 @@ fun TransactionScreen(
     accountId: Int?,
     type: String,
     viewModel: TransactionViewModel = hiltViewModel(),
+    accountViewModel: AccountViewModel,
     navigateToHistory: () -> Unit,
     navigateToAddTransaction: () -> Unit
 ) {
     val isIncome = type == "доходы"
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val selectedAccount by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
+
+    val currencySymbol = when (selectedAccount?.currency) {
+        "EUR" -> "€"
+        "USD" -> "$"
+        "RUB" -> "₽"
+        else -> ""
+    }
 
     LaunchedEffect(accountId) {
         viewModel.handleIntent(
@@ -89,9 +99,6 @@ fun TransactionScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(bottom = 32.dp),
                 onClick = navigateToAddTransaction,
                 containerColor = Color(0xFF2AE881),
                 contentColor = Color.White,
@@ -123,11 +130,7 @@ fun TransactionScreen(
                     ListItem(
                         modifier = Modifier.height(56.dp),
                         title = "Всего",
-                        currency = when (state.items.firstOrNull()?.account?.currency) {
-                            "EUR" -> "€"
-                            "USD" -> "$"
-                            else -> "₽"
-                        },
+                        currency = currencySymbol,
                         amount = state.total,
                         backgroundColor = Color(0xFFD4FAE6),
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
@@ -148,11 +151,7 @@ fun TransactionScreen(
                                 contentPadding = if (item.comment != null)
                                     PaddingValues(vertical = 16.dp, horizontal = 16.dp)
                                 else PaddingValues(vertical = 24.dp, horizontal = 16.dp),
-                                currency = when (state.items.firstOrNull()?.account?.currency) {
-                                    "EUR" -> "€"
-                                    "USD" -> "$"
-                                    else -> "₽"
-                                },
+                                currency = currencySymbol,
                                 modifier = Modifier
                             )
                             HorizontalDivider()

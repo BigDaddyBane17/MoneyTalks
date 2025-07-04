@@ -19,10 +19,10 @@ interface AccountApiService {
     @POST("accounts")
     suspend fun createAccount(@Body request: AccountCreateRequestDto): AccountDto
 
-    @GET("account/{id}")
+    @GET("accounts/{id}")
     suspend fun getAccountById(@Path("id") id: Int): AccountResponseDto
 
-    @PUT("account/{id}")
+    @PUT("accounts/{id}")
     suspend fun updateAccountById(
         @Path("id") id: Int,
         @Body request: AccountUpdateRequestDto

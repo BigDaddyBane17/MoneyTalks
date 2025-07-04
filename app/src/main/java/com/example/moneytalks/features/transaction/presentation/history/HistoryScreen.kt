@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.coreui.composable.ListItem
+import com.example.moneytalks.features.account.presentation.account.AccountViewModel
 import com.example.moneytalks.navigation.Routes
 import java.time.Instant
 import java.time.LocalDate.now
@@ -52,10 +53,20 @@ fun HistoryScreen(
     type: String,
     accountId: Int?,
     viewModel: HistoryViewModel = hiltViewModel(),
+    accountViewModel: AccountViewModel,
     navigateToAnalysis: () -> Unit,
     navigateBack: () -> Unit
 ) {
     val isIncome = type == "доходы"
+
+    val selectedAccount by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
+
+    val currencySymbol = when (selectedAccount?.currency) {
+        "EUR" -> "€"
+        "USD" -> "$"
+        "RUB" -> "₽"
+        else -> ""
+    }
 
     // Даты фильтрации
     var startDate by rememberSaveable { mutableStateOf(now().withDayOfMonth(1)) }
@@ -155,7 +166,7 @@ fun HistoryScreen(
                     ListItem(
                         title = "Сумма",
                         amount = state.total,
-                        currency = "",
+                        currency = currencySymbol,
                         modifier = Modifier,
                         backgroundColor = Color(0xFFD4FAE6),
                     )
@@ -185,7 +196,7 @@ fun HistoryScreen(
                                     leadingIcon = transaction.category.emoji,
                                     trailingIcon = R.drawable.more_vert,
                                     amount = transaction.amount,
-                                    currency = "₽",
+                                    currency = currencySymbol,
                                     description = transaction.comment,
                                     subtitle = formattedDate,
                                     modifier = Modifier,

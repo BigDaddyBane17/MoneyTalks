@@ -2,7 +2,9 @@ package com.example.moneytalks
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FloatingActionButton
@@ -94,15 +96,17 @@ fun MainAppScreen() {
             BottomBar(
                 tabRoutes = tabRoutes,
                 navController = navController,
-                selectedTab = selectedTab
+                selectedTab = selectedTab,
             )
         },
-        containerColor = Color(0xFFFef7ff)
-    ) {
+        containerColor = Color(0xFFFef7ff),
+    ) { innerPadding ->
         MainNavHost(
             navController = navController,
             selectedAccountId = selectedAccountId,
-            accountViewModel = accountViewModel
+            accountViewModel = accountViewModel,
+            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()) // если передать фулл, то он сверху делает отступ непонятный
+
         )
     }
 }

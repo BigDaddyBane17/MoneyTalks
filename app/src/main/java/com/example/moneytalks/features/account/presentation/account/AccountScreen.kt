@@ -47,13 +47,25 @@ import com.example.moneytalks.coreui.composable.ListItem
 import com.example.moneytalks.features.transaction.presentation.createEarningTransaction.CreateEarningTransactionIntent.SubmitTransaction
 import com.example.moneytalks.navigation.Routes
 
+data class CurrencyItem(
+    val name: String,
+    val iconRes: Int,
+    val code: String,
+    val symbol: String
+)
+
+val currencies = listOf(
+    CurrencyItem("Российский рубль", R.drawable.mdi_ruble, "RUB", "₽"),
+    CurrencyItem("Американский доллар", R.drawable.mdi_dollar, "USD", "$"),
+    CurrencyItem("Евро", R.drawable.mdi_euro, "EUR", "€"),
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
     viewModel: AccountViewModel,
     navigateToAccountEdit: () -> Unit,
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
@@ -77,11 +89,7 @@ fun AccountScreen(
                             .fillMaxWidth()
                             .clickable {
                                 showSheet = false
-                                viewModel.handleIntent(AccountIntent.CurrencyClick(
-                                    if (currency.name == "Российский рубль") "₽"
-                                    else if (currency.name == "Американский доллар") "$"
-                                    else "€"
-                                ))
+                                viewModel.handleIntent(AccountIntent.CurrencyClick(currency.code))
                             }
                             .padding(horizontal = 16.dp)
                             .height(72.dp),
@@ -128,7 +136,6 @@ fun AccountScreen(
             }
         }
     }
-
 
     Scaffold(
         topBar = {
@@ -182,9 +189,11 @@ fun AccountScreen(
                     CircularProgressIndicator()
                 }
             }
-
             is AccountUiState.Success -> {
                 val state = uiState as AccountUiState.Success
+
+                val currencySymbol = currencies.firstOrNull { it.code == state.account?.currency }?.symbol
+                    ?: state.account?.currency.orEmpty()
 
                 Column(
                     Modifier.padding(innerPadding)
@@ -192,16 +201,7 @@ fun AccountScreen(
                     ListItem(
                         title = "Баланс",
                         amount = state.account?.balance,
-                        currency =
-                            if(state.account?.currency == "EUR") {
-                                "€"
-                            }
-                            else if (state.account?.currency == "USD") {
-                                "$"
-                            }
-                            else {
-                                "₽"
-                            },
+                        currency = currencySymbol,
                         backgroundColor = Color(0xFFD4FAE6),
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                         trailingIcon = R.drawable.more_vert,
@@ -212,16 +212,7 @@ fun AccountScreen(
                     HorizontalDivider()
                     ListItem(
                         title = "Валюта",
-                        amount =
-                            if(state.account?.currency == "EUR") {
-                                "€"
-                            }
-                            else if (state.account?.currency == "USD") {
-                                "$"
-                            }
-                            else {
-                                "₽"
-                            },
+                        amount = currencySymbol,
                         backgroundColor = Color(0xFFD4FAE6),
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                         trailingIcon = R.drawable.more_vert,
@@ -232,7 +223,6 @@ fun AccountScreen(
                     )
                 }
             }
-
             is AccountUiState.Error -> {
                 Text(
                     text = (uiState as AccountUiState.Error).message,
@@ -241,20 +231,6 @@ fun AccountScreen(
                         .padding(16.dp)
                 )
             }
-
         }
     }
-
 }
-
-
-data class CurrencyItem(
-    val name: String,
-    val iconRes: Int
-)
-
-val currencies = listOf(
-    CurrencyItem("Российский рубль", R.drawable.mdi_ruble),
-    CurrencyItem("Американский доллар", R.drawable.mdi_dollar),
-    CurrencyItem("Евро", R.drawable.mdi_euro),
-)
