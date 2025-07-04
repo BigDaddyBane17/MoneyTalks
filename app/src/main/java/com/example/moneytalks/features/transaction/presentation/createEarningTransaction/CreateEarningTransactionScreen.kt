@@ -23,6 +23,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -99,11 +100,11 @@ fun CreateEarningTransactionScreen(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF27E780)
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
             )
         },
-        containerColor = Color(0xFFFef7ff)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         when (val state = uiState) {
             is CreateEarningTransactionUiState.Loading -> {
@@ -178,7 +179,6 @@ fun CreateEarningTransactionScreen(
                         modifier = Modifier,
                         title = "Сумма",
                         amount = viewModel.amount.ifBlank { "Введите сумму" },
-                        currency = "₽",
                         trailingIcon = R.drawable.more_vert,
                         onClick = {
                             amountText = viewModel.amount
@@ -248,7 +248,7 @@ fun CreateEarningTransactionScreen(
                     )
                     if (showTimePicker) {
                         Dialog(onDismissRequest = { showTimePicker = false }) {
-                            Surface(modifier = Modifier.padding(24.dp)) {
+                            Surface(modifier = Modifier.padding(24.dp), color = MaterialTheme.colorScheme.background) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text("Выбрать время")
                                     Spacer(modifier = Modifier.height(12.dp))

@@ -5,23 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.core.network.retryIO
 import com.example.moneytalks.features.categories.data.remote.model.CategoryDto
-import com.example.moneytalks.features.categories.domain.model.Category
 import com.example.moneytalks.features.categories.domain.repository.CategoryRepository
-import com.example.moneytalks.features.transaction.domain.repository.TransactionRepository
-import com.example.moneytalks.features.transaction.presentation.transactions.TransactionUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import javax.inject.Inject
 
 

@@ -38,7 +38,7 @@ fun ListItem(
     subtitle: String? = null,
     trailingIcon: Int? = null,
     contentPadding: PaddingValues = PaddingValues(vertical = 24.dp, horizontal = 16.dp),
-    backgroundColor: Color = Color(0xFFFeF7FF), //исправить
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     trailingComposable: @Composable (() -> Unit)? = null,
     onClick: (() -> Unit)? = null
 ) {
@@ -65,7 +65,7 @@ fun ListItem(
                 Box(
                     modifier = Modifier
                         .background(
-                            color = Color(0xFFD4FAE6),
+                            color = MaterialTheme.colorScheme.background,
                             shape = CircleShape
                         ).size(24.dp),
                     contentAlignment = Alignment.Center

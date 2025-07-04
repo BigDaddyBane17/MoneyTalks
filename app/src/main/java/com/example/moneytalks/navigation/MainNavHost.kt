@@ -23,11 +23,11 @@ import com.example.moneytalks.features.transaction.presentation.transactions.Tra
 
 @Composable
 fun MainNavHost(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String = Routes.EXPENSES_GRAPH,
     selectedAccountId: Int?,
-    accountViewModel: AccountViewModel,
-    modifier: Modifier = Modifier
+    accountViewModel: AccountViewModel
 ) {
     NavHost(
         navController = navController,
@@ -130,7 +130,10 @@ fun MainNavHost(
                 CreateAccount()
             }
             composable(Routes.ACCOUNT_EDIT) {
-                EditAccountScreen()
+                EditAccountScreen(
+                    onBack = { navController.popBackStack() },
+                    accountViewModel = accountViewModel
+                )
             }
         }
 

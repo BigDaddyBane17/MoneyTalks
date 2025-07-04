@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -37,7 +38,6 @@ import com.example.moneytalks.navigation.items
 /**
  * Основной экран приложения.
  *
- * Включает верхний топ-бар, нижнюю навигацию, fab-кнопку и основной NavHost.
  * Управляет глобальными состояниями:
  *  - текущий выбранный счет
  *  - статус сети
@@ -46,7 +46,6 @@ import com.example.moneytalks.navigation.items
  * Особенности:
  * - Реагирует на изменение состояния сети, выводит предупреждение о потере соединения.
  * - Позволяет выбрать активный счет из выпадающего меню в топ-баре.
- * - FAB-кнопка динамически меняется в зависимости от текущей вкладки.
  * - Передаёт необходимые параметры (selectedAccountId, accountViewModel) во внутренний NavHost.
  *
  *
@@ -66,6 +65,7 @@ fun MainAppScreen() {
 
     val accountViewModel: AccountViewModel = hiltViewModel()
     val selectedAccountId by accountViewModel.selectedAccountId.collectAsStateWithLifecycle()
+
 
     val tabRoutes = listOf(
         Routes.EXPENSES_GRAPH, Routes.EARNINGS_GRAPH, Routes.ACCOUNTS_GRAPH, Routes.CATEGORIES_GRAPH, Routes.SETTINGS_GRAPH
@@ -99,13 +99,13 @@ fun MainAppScreen() {
                 selectedTab = selectedTab,
             )
         },
-        containerColor = Color(0xFFFef7ff),
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         MainNavHost(
             navController = navController,
             selectedAccountId = selectedAccountId,
             accountViewModel = accountViewModel,
-            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()) // если передать фулл, то он сверху делает отступ непонятный
+            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()) // если передать фулл, то он сверху делает отступ
 
         )
     }

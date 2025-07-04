@@ -21,6 +21,9 @@ import javax.inject.Inject
  * ViewModel для получения, выбора и отображения счеирв, а также обработки состояния загрузки/ошибок.
  */
 
+
+//todo убрать логику репозитория отсюда
+
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val repository: AccountRepository,
@@ -29,7 +32,6 @@ class AccountViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<AccountUiState>(AccountUiState.Loading)
     val uiState: StateFlow<AccountUiState> = _uiState.asStateFlow()
-
 
     private val _accounts = MutableStateFlow<List<AccountDto>>(emptyList())
     val accounts: StateFlow<List<AccountDto>> = _accounts.asStateFlow()
@@ -48,10 +50,6 @@ class AccountViewModel @Inject constructor(
             is AccountIntent.CurrencyClick -> changeCurrency(intent.currency)
             AccountIntent.BalanceClick -> TODO()
         }
-    }
-
-    init {
-        loadAccounts()
     }
 
     fun loadAccounts() {
@@ -84,7 +82,6 @@ class AccountViewModel @Inject constructor(
     }
 
 
-
     fun selectAccount(accountId: Int) {
         _selectedAccountId.value = accountId
         val selected = _accounts.value.firstOrNull { it.id == accountId }
@@ -93,10 +90,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun changeCurrency(newCurrency: String) {
-        val current = _selectedAccount.value
-        if (current == null) {
-            return
-        }
+        val current = _selectedAccount.value ?: return
         viewModelScope.launch {
             try {
                 val request = AccountUpdateRequestDto(
@@ -104,8 +98,9 @@ class AccountViewModel @Inject constructor(
                     balance = current.balance,
                     currency = newCurrency
                 )
-                repository.updateAccount(current.id, request)
-                loadAccounts()
+                val updatedAccount = repository.updateAccount(current.id, request)
+                _selectedAccount.value = updatedAccount
+                _uiState.value = AccountUiState.Success(updatedAccount)
             } catch (e: Exception) {
                 _uiState.value = AccountUiState.Error("Ошибка обновления валюты: ${e.localizedMessage}")
             }

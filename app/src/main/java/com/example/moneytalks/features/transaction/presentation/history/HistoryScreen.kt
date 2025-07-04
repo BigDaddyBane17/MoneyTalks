@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -116,10 +117,11 @@ fun HistoryScreen(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF27E780)
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
         Column(
             Modifier
@@ -131,7 +133,7 @@ fun HistoryScreen(
             ListItem(
                 title = "Начало",
                 amount = startDate.format(dateFormatter),
-                backgroundColor = Color(0xFFD4FAE6),
+                backgroundColor = MaterialTheme.colorScheme.surface,
                 modifier = Modifier,
                 onClick = {
                     pickerTarget = "start"
@@ -142,7 +144,7 @@ fun HistoryScreen(
             ListItem(
                 title = "Конец",
                 amount = endDate.format(dateFormatter),
-                backgroundColor = Color(0xFFD4FAE6),
+                backgroundColor = MaterialTheme.colorScheme.surface,
                 modifier = Modifier,
                 onClick = {
                     pickerTarget = "end"
@@ -168,7 +170,7 @@ fun HistoryScreen(
                         amount = state.total,
                         currency = currencySymbol,
                         modifier = Modifier,
-                        backgroundColor = Color(0xFFD4FAE6),
+                        backgroundColor = MaterialTheme.colorScheme.surface,
                     )
 
                     if (state.items.isEmpty()) {

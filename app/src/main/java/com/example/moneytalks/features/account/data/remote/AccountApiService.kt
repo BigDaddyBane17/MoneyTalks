@@ -13,6 +13,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface AccountApiService {
+
     @GET("accounts")
     suspend fun getAccounts(): List<AccountDto>
 

@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -80,7 +81,7 @@ fun AccountScreen(
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
             sheetState = sheetState,
-            containerColor = Color(0xFFF7F2FA)
+            containerColor = MaterialTheme.colorScheme.background
         ) {
             Column {
                 currencies.forEachIndexed { index, currency ->
@@ -161,7 +162,7 @@ fun AccountScreen(
                         }
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color(0xFF27E780)
+                        containerColor = MaterialTheme.colorScheme.primary
                     ),
                 )
                 DropdownMenu(
@@ -181,7 +182,7 @@ fun AccountScreen(
                 }
             }
         },
-        containerColor = Color(0xFFFef7ff)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         when (uiState) {
             is AccountUiState.Loading -> {
@@ -202,10 +203,8 @@ fun AccountScreen(
                         title = "Баланс",
                         amount = state.account?.balance,
                         currency = currencySymbol,
-                        backgroundColor = Color(0xFFD4FAE6),
+                        backgroundColor = MaterialTheme.colorScheme.surface,
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
-                        trailingIcon = R.drawable.more_vert,
-                        onClick = navigateToAccountEdit,
                         leadingIcon = "\uD83D\uDCB0",
                         modifier = Modifier.height(56.dp)
                     )
@@ -213,7 +212,7 @@ fun AccountScreen(
                     ListItem(
                         title = "Валюта",
                         amount = currencySymbol,
-                        backgroundColor = Color(0xFFD4FAE6),
+                        backgroundColor = MaterialTheme.colorScheme.surface,
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                         trailingIcon = R.drawable.more_vert,
                         onClick = {

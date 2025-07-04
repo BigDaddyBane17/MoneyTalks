@@ -22,6 +22,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -36,11 +37,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.example.moneytalks.R
 import com.example.moneytalks.coreui.composable.ListItem
 import com.example.moneytalks.features.account.presentation.account.AccountViewModel
-import com.example.moneytalks.navigation.Routes
 import java.time.LocalDate
 
 
@@ -85,7 +84,7 @@ fun TransactionScreen(
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF27E780)
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
                     IconButton(onClick = navigateToHistory) {
@@ -100,14 +99,14 @@ fun TransactionScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = navigateToAddTransaction,
-                containerColor = Color(0xFF2AE881),
+                containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = Color.White,
                 shape = CircleShape
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Добавить")
             }
         },
-        containerColor = Color(0xFFFef7ff)
+        containerColor =  MaterialTheme.colorScheme.background
     ) { innerPadding ->
 
         when (uiState) {
@@ -132,7 +131,7 @@ fun TransactionScreen(
                         title = "Всего",
                         currency = currencySymbol,
                         amount = state.total,
-                        backgroundColor = Color(0xFFD4FAE6),
+                        backgroundColor = MaterialTheme.colorScheme.surface,
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
                     )
                     HorizontalDivider()
