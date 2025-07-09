@@ -1,7 +1,6 @@
 package com.example.moneytalks.features.transaction.presentation.createEarningTransaction
 
-import com.example.moneytalks.features.account.data.remote.model.AccountDto
-import com.example.moneytalks.features.account.domain.model.Account
+import com.example.moneytalks.features.account.data.model.AccountDto
 import com.example.moneytalks.features.categories.data.remote.model.CategoryDto
 
 sealed class CreateEarningTransactionUiState {

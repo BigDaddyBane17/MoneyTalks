@@ -1,110 +1,119 @@
 package com.example.moneytalks.features.account.presentation.account
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.moneytalks.features.account.data.remote.model.AccountDto
-import com.example.moneytalks.core.network.NetworkMonitor
-import com.example.moneytalks.core.network.retryIO
-import com.example.moneytalks.features.account.data.remote.model.AccountUpdateRequestDto
-import com.example.moneytalks.features.account.domain.repository.AccountRepository
+import com.example.moneytalks.features.account.domain.model.Account
+import com.example.moneytalks.features.account.domain.model.AccountBrief
+import com.example.moneytalks.features.account.domain.usecase.GetAccountsUseCase
+import com.example.moneytalks.features.account.domain.usecase.UpdateAccountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.IOException
 import javax.inject.Inject
 
 /**
  * ViewModel для получения, выбора и отображения счеирв, а также обработки состояния загрузки/ошибок.
  */
 
-
-//todo убрать логику репозитория отсюда
-
 @HiltViewModel
 class AccountViewModel @Inject constructor(
-    private val repository: AccountRepository,
-    private val networkMonitor: NetworkMonitor
+    private val getAccountsUseCase: GetAccountsUseCase,
+    private val updateAccountUseCase: UpdateAccountUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<AccountUiState>(AccountUiState.Loading)
-    val uiState: StateFlow<AccountUiState> = _uiState.asStateFlow()
-
-    private val _accounts = MutableStateFlow<List<AccountDto>>(emptyList())
-    val accounts: StateFlow<List<AccountDto>> = _accounts.asStateFlow()
-
-    private val _selectedAccount = MutableStateFlow<AccountDto?>(null)
-    val selectedAccount: StateFlow<AccountDto?> = _selectedAccount.asStateFlow()
-
+    private val _accounts = MutableStateFlow<List<Account>>(emptyList())
+    val accounts: StateFlow<List<Account>> = _accounts.asStateFlow()
 
     private val _selectedAccountId = MutableStateFlow<Int?>(null)
     val selectedAccountId: StateFlow<Int?> = _selectedAccountId.asStateFlow()
 
+    private val _uiState = MutableStateFlow<AccountUiState>(AccountUiState.Loading)
+    val uiState: StateFlow<AccountUiState> = _uiState.asStateFlow()
 
-    fun handleIntent(intent: AccountIntent) {
-        when (intent) {
-            AccountIntent.LoadAccountData -> loadAccounts()
-            is AccountIntent.CurrencyClick -> changeCurrency(intent.currency)
-            AccountIntent.BalanceClick -> TODO()
-        }
-    }
+    val currency: StateFlow<String> = combine(accounts, selectedAccountId) { accounts, id ->
+        val acc = id?.let { selId -> accounts.find { it.id == selId } } ?: accounts.firstOrNull()
+        acc?.currency ?: "₽"
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "₽")
 
-    fun loadAccounts() {
+    init {
         viewModelScope.launch {
-            if (!networkMonitor.isConnected.value) {
-                _uiState.value = AccountUiState.Error("Нет соединения с интернетом")
-                return@launch
-            }
-            try {
-                val loadedAccounts = retryIO(times = 3, delayMillis = 2000) {
-                    repository.getAccounts()
+            getAccountsUseCase.invoke()
+                .catch { ex -> _uiState.value = AccountUiState.Error(ex.message ?: "Ошибка") }
+                .collect { list ->
+                    _accounts.value = list
                 }
-                _accounts.value = loadedAccounts
+        }
 
-                if (_selectedAccountId.value == null || loadedAccounts.none { it.id == _selectedAccountId.value }) {
-                    _selectedAccountId.value = loadedAccounts.firstOrNull()?.id
+        viewModelScope.launch {
+            combine(_accounts, _selectedAccountId) { list, id ->
+                if (list.isEmpty()) {
+                    AccountUiState.Loading
+                } else {
+                    val acc = id?.let { selId -> list.find { it.id == selId } } ?: list.first()
+                    AccountUiState.Success(acc)
                 }
-
-                val selected = loadedAccounts.firstOrNull { it.id == _selectedAccountId.value }
-                    ?: loadedAccounts.firstOrNull()
-
-                _selectedAccount.value = selected
-                _uiState.value = AccountUiState.Success(selected)
-            } catch (e: IOException) {
-                _uiState.value = AccountUiState.Error("Нет соединения с интернетом")
-            } catch (e: Exception) {
-                _uiState.value = AccountUiState.Error("Ошибка загрузки: ${e.localizedMessage}")
-            }
+            }.catch { ex ->
+                _uiState.value = AccountUiState.Error(ex.message ?: "Ошибка")
+            }.collect { _uiState.value = it }
         }
     }
-
 
     fun selectAccount(accountId: Int) {
         _selectedAccountId.value = accountId
-        val selected = _accounts.value.firstOrNull { it.id == accountId }
-        _selectedAccount.value = selected
-        _uiState.value = AccountUiState.Success(selected)
     }
 
-    fun changeCurrency(newCurrency: String) {
-        val current = _selectedAccount.value ?: return
-        viewModelScope.launch {
-            try {
-                val request = AccountUpdateRequestDto(
-                    name = current.name,
-                    balance = current.balance,
-                    currency = newCurrency
-                )
-                val updatedAccount = repository.updateAccount(current.id, request)
-                _selectedAccount.value = updatedAccount
-                _uiState.value = AccountUiState.Success(updatedAccount)
-            } catch (e: Exception) {
-                _uiState.value = AccountUiState.Error("Ошибка обновления валюты: ${e.localizedMessage}")
+    fun handleIntent(intent: AccountIntent) {
+        when (intent) {
+            is AccountIntent.CurrencyClick -> {
+                viewModelScope.launch {
+                    val account = _accounts.value.find { it.id == intent.accountId }
+                    if (account != null) {
+                        val updated = AccountBrief(
+                            id = account.id,
+                            name = account.name,
+                            balance = account.balance.toBigDecimal(),
+                            currency = intent.currency
+                        )
+                        updateAccountUseCase.invoke(updated).collect { newAccount ->
+                            _accounts.update { list ->
+                                list.map { acc ->
+                                    if (acc.id == newAccount.id) {
+                                        acc.copy(currency = newAccount.currency)
+                                    } else acc
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            is AccountIntent.SelectAccount -> {
+                selectAccount(intent.accountId)
+            }
+            is AccountIntent.AccountEdit -> {
+                viewModelScope.launch {
+                    updateAccountUseCase.invoke(intent.account).collect { newAccount ->
+                        _accounts.update { list ->
+                            list.map { acc ->
+                                if (acc.id == newAccount.id) {
+                                    acc.copy(
+                                        name = newAccount.name,
+                                        balance = newAccount.balance.toString(),
+                                        currency = newAccount.currency
+                                    )
+                                } else acc
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-
 }
+

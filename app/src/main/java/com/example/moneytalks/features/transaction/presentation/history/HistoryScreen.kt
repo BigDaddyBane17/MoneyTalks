@@ -60,14 +60,14 @@ fun HistoryScreen(
 ) {
     val isIncome = type == "доходы"
 
-    val selectedAccount by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
-
-    val currencySymbol = when (selectedAccount?.currency) {
-        "EUR" -> "€"
-        "USD" -> "$"
-        "RUB" -> "₽"
-        else -> ""
-    }
+//    val selectedAccount by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
+//
+//    val currencySymbol = when (selectedAccount?.currency) {
+//        "EUR" -> "€"
+//        "USD" -> "$"
+//        "RUB" -> "₽"
+//        else -> ""
+//    }
 
     // Даты фильтрации
     var startDate by rememberSaveable { mutableStateOf(now().withDayOfMonth(1)) }
@@ -168,7 +168,7 @@ fun HistoryScreen(
                     ListItem(
                         title = "Сумма",
                         amount = state.total,
-                        currency = currencySymbol,
+                        currency = "Р",
                         modifier = Modifier,
                         backgroundColor = MaterialTheme.colorScheme.surface,
                     )
@@ -198,7 +198,7 @@ fun HistoryScreen(
                                     leadingIcon = transaction.category.emoji,
                                     trailingIcon = R.drawable.more_vert,
                                     amount = transaction.amount,
-                                    currency = currencySymbol,
+                                    currency = "Р",
                                     description = transaction.comment,
                                     subtitle = formattedDate,
                                     modifier = Modifier,

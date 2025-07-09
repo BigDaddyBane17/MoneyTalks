@@ -1,8 +1,8 @@
 package com.example.moneytalks.features.account.di
 
-import com.example.moneytalks.features.account.data.AccountRepositoryImpl
-import com.example.moneytalks.features.account.data.remote.AccountApiService
-import com.example.moneytalks.features.account.domain.repository.AccountRepository
+import com.example.moneytalks.features.account.data.datasource.AccountRemoteDataSourceImpl
+import com.example.moneytalks.features.account.data.api.AccountApiService
+import com.example.moneytalks.features.account.data.datasource.AccountRemoteDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +18,7 @@ object AccountModule {
         retrofit.create(AccountApiService::class.java)
 
     @Provides
-    fun provideAccountRepository(accountApiService: AccountApiService): AccountRepository =
-        AccountRepositoryImpl(accountApiService)
+    fun provideAccountRepository(accountApiService: AccountApiService): AccountRemoteDataSource =
+        AccountRemoteDataSourceImpl(accountApiService)
+
 }

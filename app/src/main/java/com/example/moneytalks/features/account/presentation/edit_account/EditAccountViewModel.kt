@@ -3,10 +3,9 @@ package com.example.moneytalks.features.account.presentation.edit_account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.core.network.NetworkMonitor
-import com.example.moneytalks.features.account.data.remote.model.AccountDto
-import com.example.moneytalks.features.account.data.remote.model.AccountUpdateRequestDto
-import com.example.moneytalks.features.account.domain.repository.AccountRepository
-import com.example.moneytalks.features.account.presentation.account.AccountUiState
+import com.example.moneytalks.features.account.data.model.AccountDto
+import com.example.moneytalks.features.account.data.model.AccountUpdateRequestDto
+import com.example.moneytalks.features.account.data.datasource.AccountRemoteDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditAccountViewModel @Inject constructor(
-    private val repository: AccountRepository,
+    private val repository: AccountRemoteDataSource,
     private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
 

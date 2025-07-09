@@ -1,5 +1,5 @@
 package com.example.moneytalks.features.transaction.data.remote.model
-import com.example.moneytalks.features.account.data.remote.model.AccountBriefDto
+import com.example.moneytalks.features.account.data.model.AccountBriefDto
 import com.example.moneytalks.features.categories.data.remote.model.CategoryDto
 import kotlinx.serialization.Serializable
 

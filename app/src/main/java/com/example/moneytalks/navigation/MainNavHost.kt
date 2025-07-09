@@ -19,7 +19,6 @@ import com.example.moneytalks.features.transaction.presentation.createEarningTra
 import com.example.moneytalks.features.transaction.presentation.createSpendingTransaction.CreateSpendingTransactionScreen
 import com.example.moneytalks.features.transaction.presentation.history.HistoryScreen
 import com.example.moneytalks.features.transaction.presentation.transactions.TransactionScreen
-import com.example.moneytalks.features.transaction.presentation.transactions.TransactionViewModel
 
 @Composable
 fun MainNavHost(

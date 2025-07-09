@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.core.network.retryIO
+import com.example.moneytalks.features.account.data.datasource.AccountRemoteDataSource
 import com.example.moneytalks.features.transaction.domain.repository.TransactionRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,9 +18,9 @@ import javax.inject.Inject
  * ViewModel для загрузки и отображения списка транзакций, а также обработки пользовательских действий.
  */
 
-@HiltViewModel
 class TransactionViewModel @Inject constructor(
     private val repository: TransactionRepository,
+    private val accountRemoteDataSource: AccountRemoteDataSource,
     private val networkMonitor: NetworkMonitor
 ): ViewModel() {
 
@@ -28,9 +28,11 @@ class TransactionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<TransactionUiState>(TransactionUiState.Loading)
     val uiState: StateFlow<TransactionUiState> = _uiState.asStateFlow()
 
+    //private val accounts = accountRemoteDataSource.getAccounts()
+
     fun handleIntent(intent: TransactionIntent, isIncome: Boolean) {
         when (intent) {
-            is TransactionIntent.LoadExpenses -> loadData(intent.accountId ?: 1, intent.startDate, intent.endDate, isIncome)
+            is TransactionIntent.LoadExpenses -> loadData(intent.accountId ?: 66, intent.startDate, intent.endDate, isIncome)
             is TransactionIntent.OnItemClicked -> handleItemClick()
         }
     }

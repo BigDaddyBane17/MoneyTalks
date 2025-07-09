@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.moneytalks.ui.theme.MoneyTalksTheme
+import com.example.moneytalks.coreui.theme.MoneyTalksTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

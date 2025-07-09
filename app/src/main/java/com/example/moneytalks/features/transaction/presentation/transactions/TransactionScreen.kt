@@ -55,14 +55,13 @@ fun TransactionScreen(
 ) {
     val isIncome = type == "доходы"
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val selectedAccount by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
-
-    val currencySymbol = when (selectedAccount?.currency) {
-        "EUR" -> "€"
-        "USD" -> "$"
-        "RUB" -> "₽"
-        else -> ""
-    }
+    //val selectedAccount by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
+    val currencySymbol = "Р"//when (selectedAccount?.currency) {
+//        "EUR" -> "€"
+//        "USD" -> "$"
+//        "RUB" -> "₽"
+//        else -> ""
+//    }
 
     LaunchedEffect(accountId) {
         viewModel.handleIntent(

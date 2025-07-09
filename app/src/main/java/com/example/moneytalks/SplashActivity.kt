@@ -19,14 +19,12 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.moneytalks.ui.theme.MoneyTalksTheme
+import com.example.moneytalks.coreui.theme.MoneyTalksTheme
 
 
 class SplashActivity: ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             MoneyTalksTheme {
                 SplashScreen(

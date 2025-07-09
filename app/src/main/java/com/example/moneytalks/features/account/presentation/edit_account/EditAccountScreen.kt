@@ -47,11 +47,7 @@ fun EditAccountScreen(
     var name by remember(account) { mutableStateOf(account?.name.orEmpty()) }
     var balance by remember(account) { mutableStateOf(account?.balance.orEmpty()) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val selectedAccount by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
 
-    LaunchedEffect(selectedAccount?.id) {
-        viewModel.setAccount(selectedAccount)
-    }
 
     Scaffold(
         topBar = {

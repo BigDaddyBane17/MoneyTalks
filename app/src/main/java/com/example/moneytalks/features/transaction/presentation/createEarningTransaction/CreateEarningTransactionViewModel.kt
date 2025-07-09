@@ -3,13 +3,12 @@ package com.example.moneytalks.features.transaction.presentation.createEarningTr
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.moneytalks.features.account.data.remote.model.AccountDto
+import com.example.moneytalks.features.account.data.model.AccountDto
 import com.example.moneytalks.features.categories.data.remote.model.CategoryDto
 import com.example.moneytalks.features.transaction.data.remote.model.TransactionRequestDto
 import com.example.moneytalks.core.network.NetworkMonitor
 import com.example.moneytalks.core.network.retryIO
-import com.example.moneytalks.features.account.domain.model.Account
-import com.example.moneytalks.features.account.domain.repository.AccountRepository
+import com.example.moneytalks.features.account.data.datasource.AccountRemoteDataSource
 import com.example.moneytalks.features.categories.domain.repository.CategoryRepository
 import com.example.moneytalks.features.transaction.domain.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateEarningTransactionViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
-    private val accountRepository: AccountRepository,
+    private val accountRemoteDataSource: AccountRemoteDataSource,
     private val categoryRepository: CategoryRepository,
     private val networkMonitor: NetworkMonitor
 ) : ViewModel() {
@@ -66,7 +65,7 @@ class CreateEarningTransactionViewModel @Inject constructor(
             }
             try {
                 val loadedAccounts = retryIO(times = 3, delayMillis = 2000){
-                    accountRepository.getAccounts()
+                    accountRemoteDataSource.getAccounts()
                 }
                 val loadedCategories = retryIO(times = 3, delayMillis = 2000){
                     categoryRepository.getCategoriesByType(isIncome = true)

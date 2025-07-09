@@ -40,13 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
+
 import com.example.moneytalks.R
 import com.example.moneytalks.coreui.composable.ListItem
-import com.example.moneytalks.features.transaction.presentation.createEarningTransaction.CreateEarningTransactionIntent.SubmitTransaction
-import com.example.moneytalks.navigation.Routes
 
 data class CurrencyItem(
     val name: String,
@@ -68,14 +66,13 @@ fun AccountScreen(
     navigateToAccountEdit: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
+    val currency by viewModel.currency.collectAsStateWithLifecycle()
+    val selectedAccount = (uiState as? AccountUiState.Success)?.account
+
     val sheetState = rememberModalBottomSheetState()
     var showSheet by remember { mutableStateOf(false) }
-    val accounts by viewModel.accounts.collectAsStateWithLifecycle()
     var showAccountMenu by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        viewModel.handleIntent(AccountIntent.LoadAccountData)
-    }
 
     if (showSheet) {
         ModalBottomSheet(
@@ -84,26 +81,26 @@ fun AccountScreen(
             containerColor = MaterialTheme.colorScheme.background
         ) {
             Column {
-                currencies.forEachIndexed { index, currency ->
+                currencies.forEachIndexed { index, curr ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 showSheet = false
-                                viewModel.handleIntent(AccountIntent.CurrencyClick(currency.code))
+                                viewModel.handleIntent(AccountIntent.CurrencyClick(selectedAccount!!.id, curr.symbol))
                             }
                             .padding(horizontal = 16.dp)
                             .height(72.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            painter = painterResource(id = currency.iconRes),
+                            painter = painterResource(id = curr.iconRes),
                             contentDescription = null,
                             modifier = Modifier.size(28.dp)
                         )
                         Spacer(Modifier.width(16.dp))
                         Text(
-                            text = currency.name,
+                            text = curr.name,
                             color = Color.Black
                         )
                     }
@@ -192,17 +189,13 @@ fun AccountScreen(
             }
             is AccountUiState.Success -> {
                 val state = uiState as AccountUiState.Success
-
-                val currencySymbol = currencies.firstOrNull { it.code == state.account?.currency }?.symbol
-                    ?: state.account?.currency.orEmpty()
-
                 Column(
                     Modifier.padding(innerPadding)
                 ) {
                     ListItem(
                         title = "Баланс",
                         amount = state.account?.balance,
-                        currency = currencySymbol,
+                        currency = currency,
                         backgroundColor = MaterialTheme.colorScheme.surface,
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                         leadingIcon = "\uD83D\uDCB0",
@@ -211,7 +204,7 @@ fun AccountScreen(
                     HorizontalDivider()
                     ListItem(
                         title = "Валюта",
-                        amount = currencySymbol,
+                        amount = currency,
                         backgroundColor = MaterialTheme.colorScheme.surface,
                         contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                         trailingIcon = R.drawable.more_vert,
