@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.detekt)
+    // alias(libs.plugins.detekt)
 }
 
 android {
@@ -90,8 +90,8 @@ dependencies {
     implementation(project(":feature_account"))
     implementation(project(":feature_account:data"))
     implementation(project(":feature_account:domain"))
-
     implementation(project(":feature_categories"))
+
     implementation(project(":feature_categories:data"))
     implementation(project(":feature_categories:domain"))
 
