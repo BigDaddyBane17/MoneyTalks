@@ -1,4 +1,8 @@
 package com.example.feature_categories.ui
 
-class CategoriesScreen {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun CategoriesScreen() {
+
 }

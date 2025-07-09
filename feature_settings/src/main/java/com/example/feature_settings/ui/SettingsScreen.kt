@@ -1,4 +1,8 @@
 package com.example.feature_settings.ui
 
-class SettingsScreen {
+import androidx.compose.runtime.Composable
+
+@Composable
+fun SettingsScreen() {
+
 }
