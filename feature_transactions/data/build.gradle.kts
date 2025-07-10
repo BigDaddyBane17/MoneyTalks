@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.data"
+    namespace = "com.example.feature_transactions.data"
     compileSdk = 35
 
     defaultConfig {

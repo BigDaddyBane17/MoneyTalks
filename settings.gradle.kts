@@ -18,8 +18,8 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
 rootProject.name = "MoneyTalks"
+
 include(":app")
 include(":core")
 include(":core_ui")

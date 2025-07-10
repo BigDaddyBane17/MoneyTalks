@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -42,6 +43,11 @@ android {
 dependencies {
     implementation(project(":core_ui"))
     implementation(project(":core"))
+    implementation(project(":feature_transactions:domain"))
+    implementation(project(":feature_transactions:data"))
+    implementation(project(":feature_account:domain"))
+    implementation(project(":feature_account:data"))
+    implementation(project(":feature_account"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
@@ -66,5 +72,8 @@ dependencies {
     implementation(libs.datetime)
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.dagger)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    ksp(libs.dagger.compiler)
     implementation(libs.androidx.datastore.preferences)
 }
