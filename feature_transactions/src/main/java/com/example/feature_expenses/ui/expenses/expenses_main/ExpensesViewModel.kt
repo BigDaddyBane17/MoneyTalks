@@ -22,7 +22,7 @@ class ExpensesViewModel @Inject constructor(
     val state: StateFlow<ExpensesState> = _state.asStateFlow()
 
     init {
-        // Подписываемся на изменения выбранного счета
+
         observeSelectedAccount()
     }
 

@@ -10,13 +10,10 @@ import androidx.navigation.compose.navigation
 import com.example.core.navigation.Routes
 import com.example.feature_expenses.ui.expenses.expenses_add.ExpensesAddScreen
 import com.example.feature_expenses.ui.expenses.expenses_history.ExpensesHistoryScreen
+import com.example.feature_expenses.ui.expenses.expenses_history.ExpensesHistoryViewModel
 import com.example.feature_expenses.ui.expenses.expenses_main.ExpensesScreen
 import com.example.feature_expenses.ui.expenses.expenses_main.ExpensesViewModel
-import com.example.feature_expenses.ui.history.HistoryViewModel
 import com.example.feature_expenses.di.DaggerExpensesComponent
-import com.example.feature_expenses.di.DaggerHistoryComponent
-import com.example.feature_account.di.DaggerAccountComponent
-import com.example.feature_account.ui.account_main.AccountViewModel
 import com.example.core.di.FeatureComponentProvider
 
 fun NavGraphBuilder.expensesNavGraph(
@@ -45,22 +42,15 @@ fun NavGraphBuilder.expensesNavGraph(
             val featureComponentProvider = context.applicationContext as FeatureComponentProvider
             val featureComponent = featureComponentProvider.provideFeatureComponent()
             
-            // Inject HistoryViewModel
-            val historyComponent = DaggerHistoryComponent.factory().create(featureComponent)
-            val historyViewModelFactory = historyComponent.viewModelFactory()
-            val historyViewModel: HistoryViewModel = viewModel(factory = historyViewModelFactory)
-            
-            // Inject AccountViewModel
-            val accountComponent = DaggerAccountComponent.factory().create(featureComponent)
-            val accountViewModelFactory = accountComponent.viewModelFactory()
-            val accountViewModel: AccountViewModel = viewModel(factory = accountViewModelFactory)
+            // Inject ExpensesHistoryViewModel from ExpensesComponent
+            val expensesComponent = DaggerExpensesComponent.factory().create(featureComponent)
+            val expensesViewModelFactory = expensesComponent.viewModelFactory()
+            val historyViewModel: ExpensesHistoryViewModel = viewModel(factory = expensesViewModelFactory)
             
             ExpensesHistoryScreen(
                 navigateToAnalysis = { navController.navigate(Routes.EXPENSES_ANALYSIS) },
                 navigateBack = { navController.popBackStack() },
-                viewModel = historyViewModel,
-                accountViewModel = accountViewModel,
-                accountId = null // Will be retrieved reactively from accountViewModel
+                viewModel = historyViewModel
             )
         }
         composable(Routes.EXPENSES_ADD) {

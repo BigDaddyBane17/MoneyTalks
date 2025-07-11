@@ -8,7 +8,7 @@ interface TransactionRepository {
     suspend fun getExpensesByDate(accountId: Int, date: LocalDate): Flow<List<Transaction>>
     suspend fun getIncomesByDate(accountId: Int, date: LocalDate): Flow<List<Transaction>>
     
-    // New methods for date range support
+    // For history screens with date range
     suspend fun getExpensesByDateRange(accountId: Int, startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>>
     suspend fun getIncomesByDateRange(accountId: Int, startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>>
 }

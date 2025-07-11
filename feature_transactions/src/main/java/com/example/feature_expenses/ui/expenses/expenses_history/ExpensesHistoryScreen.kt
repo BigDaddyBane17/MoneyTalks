@@ -1,11 +1,17 @@
 package com.example.feature_expenses.ui.expenses.expenses_history
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -13,34 +19,78 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.core_ui.R
+import com.example.core_ui.components.CustomDatePickerDialog
+import com.example.core_ui.components.ListItem
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesHistoryScreen(
     navigateToAnalysis: () -> Unit,
     navigateBack: () -> Unit,
+    viewModel: ExpensesHistoryViewModel
 ) {
+    var startDate by rememberSaveable { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
+    var endDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
+    var pickerTarget by remember { mutableStateOf<String?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'г.'", Locale("ru"))
+
+    LaunchedEffect(startDate, endDate) {
+        viewModel.handleIntent(
+            ExpensesHistoryIntent.LoadHistory(
+                startDate = startDate,
+                endDate = endDate
+            )
+        )
+    }
+
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    val currencySymbol = when (uiState.currency) {
+        "EUR" -> "€"
+        "USD" -> "$"
+        "RUB" -> "₽"
+        else -> ""
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("История расходов") },
-                navigationIcon = {
-                    IconButton(onClick = navigateBack) {
+                title = {
+                    Text("История расходов")
+                },
+                actions = {
+                    IconButton(
+                        onClick = navigateToAnalysis
+                    ) {
                         Icon(
-                            painter = painterResource(R.drawable.back),
-                            contentDescription = "Назад"
+                            painter = painterResource(id = R.drawable.history),
+                            contentDescription = "Анализ",
                         )
                     }
                 },
-                actions = {
-                    IconButton(onClick = navigateToAnalysis) {
+                navigationIcon = {
+                    IconButton(onClick = navigateBack) {
                         Icon(
-                            painter = painterResource(R.drawable.history),
-                            contentDescription = "Анализ"
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Назад"
                         )
                     }
                 },
@@ -49,15 +99,116 @@ fun ExpensesHistoryScreen(
                 ),
             )
         },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
+        containerColor = MaterialTheme.colorScheme.background,
+    ) { innerPadding ->
+        Column(
+            Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
         ) {
-            Text(text = "История расходов")
+            // Блок выбора дат
+            ListItem(
+                title = "Начало",
+                amount = startDate.format(dateFormatter),
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                modifier = Modifier,
+                onClick = {
+                    pickerTarget = "start"
+                    showDialog = true
+                }
+            )
+            HorizontalDivider()
+            ListItem(
+                title = "Конец",
+                amount = endDate.format(dateFormatter),
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                modifier = Modifier,
+                onClick = {
+                    pickerTarget = "end"
+                    showDialog = true
+                }
+            )
+            HorizontalDivider()
+
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                uiState.error != null -> {
+                    Text(
+                        uiState.error!!,
+                        modifier = Modifier.padding(16.dp),
+                        color = Color.Red
+                    )
+                }
+                else -> {
+                    ListItem(
+                        title = "Сумма",
+                        amount = uiState.totalAmount,
+                        currency = currencySymbol,
+                        modifier = Modifier,
+                        backgroundColor = MaterialTheme.colorScheme.surface,
+                    )
+
+                    if (uiState.expenses.isEmpty()) {
+                        Text(
+                            "Нет операций",
+                            modifier = Modifier.padding(16.dp),
+                            color = Color.Gray
+                        )
+                    } else {
+                        val outputFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy, HH:mm", Locale("ru"))
+                        uiState.expenses
+                            .sortedBy { it.transactionDate }
+                            .forEach { transaction ->
+                                val formattedDate = try {
+                                    transaction.transactionDate.format(outputFormatter)
+                                } catch (e: Exception) {
+                                    transaction.transactionDate.toString()
+                                }
+                                ListItem(
+                                    title = transaction.categoryName,
+                                    leadingIcon = transaction.categoryEmoji,
+                                    trailingIcon = R.drawable.more_vert,
+                                    amount = transaction.amount,
+                                    currency = currencySymbol,
+                                    description = transaction.comment,
+                                    subtitle = formattedDate,
+                                    modifier = Modifier,
+                                    onClick = {}
+                                )
+                                HorizontalDivider()
+                            }
+                    }
+                }
+            }
+        }
+
+        if (showDialog) {
+            val initialDate = when (pickerTarget) {
+                "start" -> startDate
+                "end" -> endDate
+                else -> LocalDate.now()
+            }
+            
+            CustomDatePickerDialog(
+                onDateSelected = { selectedDate ->
+                    when (pickerTarget) {
+                        "start" -> startDate = selectedDate
+                        "end" -> endDate = selectedDate
+                    }
+                },
+                onDismiss = { showDialog = false },
+                initialDate = initialDate
+            )
         }
     }
 }

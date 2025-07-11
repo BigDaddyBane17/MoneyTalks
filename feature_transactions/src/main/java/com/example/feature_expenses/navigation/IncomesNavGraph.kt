@@ -10,13 +10,10 @@ import com.example.core.navigation.Routes
 import com.example.core.di.FeatureComponentProvider
 import com.example.feature_expenses.ui.incomes.incomes_add.IncomesAddScreen
 import com.example.feature_expenses.ui.incomes.incomes_history.IncomesHistoryScreen
+import com.example.feature_expenses.ui.incomes.incomes_history.IncomesHistoryViewModel
 import com.example.feature_expenses.ui.incomes.incomes_main.IncomesScreen
 import com.example.feature_expenses.ui.incomes.incomes_main.IncomesViewModel
-import com.example.feature_expenses.ui.history.HistoryViewModel
 import com.example.feature_expenses.di.DaggerIncomesComponent
-import com.example.feature_expenses.di.DaggerHistoryComponent
-import com.example.feature_account.di.DaggerAccountComponent
-import com.example.feature_account.ui.account_main.AccountViewModel
 
 fun NavGraphBuilder.incomesNavGraph(
     navController: NavHostController
@@ -44,22 +41,15 @@ fun NavGraphBuilder.incomesNavGraph(
             val featureComponentProvider = context.applicationContext as FeatureComponentProvider
             val featureComponent = featureComponentProvider.provideFeatureComponent()
             
-            // Inject HistoryViewModel
-            val historyComponent = DaggerHistoryComponent.factory().create(featureComponent)
-            val historyViewModelFactory = historyComponent.viewModelFactory()
-            val historyViewModel: HistoryViewModel = viewModel(factory = historyViewModelFactory)
-            
-            // Inject AccountViewModel
-            val accountComponent = DaggerAccountComponent.factory().create(featureComponent)
-            val accountViewModelFactory = accountComponent.viewModelFactory()
-            val accountViewModel: AccountViewModel = viewModel(factory = accountViewModelFactory)
+            // Inject IncomesHistoryViewModel from IncomesComponent
+            val incomesComponent = DaggerIncomesComponent.factory().create(featureComponent)
+            val incomesViewModelFactory = incomesComponent.viewModelFactory()
+            val historyViewModel: IncomesHistoryViewModel = viewModel(factory = incomesViewModelFactory)
             
             IncomesHistoryScreen(
                 navigateToAnalysis = { navController.navigate(Routes.EARNINGS_ANALYSIS) },
                 onBack = { navController.popBackStack() },
-                viewModel = historyViewModel,
-                accountViewModel = accountViewModel,
-                accountId = null // Will be retrieved reactively from accountViewModel
+                viewModel = historyViewModel
             )
         }
         composable(Routes.EARNINGS_ADD) {
