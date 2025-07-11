@@ -6,9 +6,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.example.core.navigation.Routes
 import com.example.core.di.FeatureComponentProvider
 import com.example.feature_expenses.ui.incomes.incomes_add.IncomesAddScreen
+import com.example.feature_expenses.ui.incomes.incomes_add.IncomesAddViewModel
+import com.example.feature_expenses.ui.incomes.incomes_edit.IncomesEditScreen
+import com.example.feature_expenses.ui.incomes.incomes_edit.IncomesEditViewModel
 import com.example.feature_expenses.ui.incomes.incomes_history.IncomesHistoryScreen
 import com.example.feature_expenses.ui.incomes.incomes_history.IncomesHistoryViewModel
 import com.example.feature_expenses.ui.incomes.incomes_main.IncomesScreen
@@ -22,7 +27,7 @@ fun NavGraphBuilder.incomesNavGraph(
         startDestination = Routes.EARNINGS,
         route = Routes.EARNINGS_GRAPH
     ) {
-        composable(Routes.EARNINGS) { backStackEntry ->
+        composable(Routes.EARNINGS) {
             val context = LocalContext.current
             val featureComponentProvider = context.applicationContext as FeatureComponentProvider
             val featureComponent = featureComponentProvider.provideFeatureComponent()
@@ -33,30 +38,66 @@ fun NavGraphBuilder.incomesNavGraph(
             IncomesScreen(
                 navigateToHistory = { navController.navigate(Routes.EARNINGS_HISTORY) },
                 navigateToAddTransaction = { navController.navigate(Routes.EARNINGS_ADD) },
+                navigateToEditTransaction = { transactionId -> 
+                    navController.navigate(Routes.earningsEdit(transactionId))
+                },
                 viewModel = viewModel
             )
         }
+
+        composable(Routes.EARNINGS_ADD) {
+            val context = LocalContext.current
+            val featureComponentProvider = context.applicationContext as FeatureComponentProvider
+            val featureComponent = featureComponentProvider.provideFeatureComponent()
+            val incomesComponent = DaggerIncomesComponent.factory().create(featureComponent)
+            val viewModelFactory = incomesComponent.viewModelFactory()
+            val viewModel: IncomesAddViewModel = viewModel(factory = viewModelFactory)
+            
+            IncomesAddScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
+        }
+        
+        composable(
+            route = Routes.EARNINGS_EDIT,
+            arguments = listOf(navArgument("transactionId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val transactionId = backStackEntry.arguments?.getInt("transactionId") ?: 0
+            val context = LocalContext.current
+            val featureComponentProvider = context.applicationContext as FeatureComponentProvider
+            val featureComponent = featureComponentProvider.provideFeatureComponent()
+            val incomesComponent = DaggerIncomesComponent.factory().create(featureComponent)
+            
+            // Create ViewModel with transactionId parameter
+            val viewModel = IncomesEditViewModel(
+                transactionId = transactionId,
+                getTransactionByIdUseCase = incomesComponent.getTransactionByIdUseCase(),
+                updateTransactionUseCase = incomesComponent.updateTransactionUseCase(),
+                deleteTransactionUseCase = incomesComponent.deleteTransactionUseCase(),
+                accountRepository = incomesComponent.accountRepository(),
+                categoryRepository = incomesComponent.categoryRepository()
+            )
+            
+            IncomesEditScreen(
+                onBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
+        }
+
         composable(Routes.EARNINGS_HISTORY) {
             val context = LocalContext.current
             val featureComponentProvider = context.applicationContext as FeatureComponentProvider
             val featureComponent = featureComponentProvider.provideFeatureComponent()
-            
-            // Inject IncomesHistoryViewModel from IncomesComponent
             val incomesComponent = DaggerIncomesComponent.factory().create(featureComponent)
-            val incomesViewModelFactory = incomesComponent.viewModelFactory()
-            val historyViewModel: IncomesHistoryViewModel = viewModel(factory = incomesViewModelFactory)
+            val viewModelFactory = incomesComponent.viewModelFactory()
+            val viewModel: IncomesHistoryViewModel = viewModel(factory = viewModelFactory)
             
             IncomesHistoryScreen(
-                navigateToAnalysis = { navController.navigate(Routes.EARNINGS_ANALYSIS) },
+                navigateToAnalysis = { /* TODO: Implement analysis navigation */ },
                 onBack = { navController.popBackStack() },
-                viewModel = historyViewModel
+                viewModel = viewModel
             )
-        }
-        composable(Routes.EARNINGS_ADD) {
-            IncomesAddScreen(onBack = { navController.popBackStack() })
-        }
-        composable(Routes.EARNINGS_ANALYSIS) {
-            // TODO
         }
     }
 }

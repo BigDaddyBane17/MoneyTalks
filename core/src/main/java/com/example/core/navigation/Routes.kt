@@ -10,11 +10,13 @@ object Routes {
     const val EXPENSES = "расходы"
     const val EXPENSES_HISTORY = "расходы_история"
     const val EXPENSES_ADD = "расходы_добавить"
+    const val EXPENSES_EDIT = "расходы_редактировать/{transactionId}"
     const val EXPENSES_ANALYSIS = "расходы_анализ"
 
     const val EARNINGS = "доходы"
     const val EARNINGS_HISTORY = "доходы_история"
     const val EARNINGS_ADD = "доходы_добавить"
+    const val EARNINGS_EDIT = "доходы_редактировать/{transactionId}"
     const val EARNINGS_ANALYSIS = "доходы_анализ"
 
     const val ACCOUNT = "счет"
@@ -22,4 +24,8 @@ object Routes {
 
     const val CATEGORIES = "статьи"
     const val SETTINGS = "настройки"
+    
+    // Helper functions to create routes with parameters
+    fun expensesEdit(transactionId: Int) = "расходы_редактировать/$transactionId"
+    fun earningsEdit(transactionId: Int) = "доходы_редактировать/$transactionId"
 }

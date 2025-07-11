@@ -1,6 +1,7 @@
 package com.example.core.di
 
 import com.example.core.network.AuthInterceptor
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import okhttp3.Interceptor
@@ -35,6 +36,10 @@ object NetworkModule {
     ): Retrofit = Retrofit.Builder()
         .client(okHttpClient)
         .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create(
+            GsonBuilder()
+                .serializeNulls()
+                .create()
+        ))
         .build()
 }

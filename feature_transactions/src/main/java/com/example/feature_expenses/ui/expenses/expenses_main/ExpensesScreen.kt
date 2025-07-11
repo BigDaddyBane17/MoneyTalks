@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -30,6 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.core_ui.R
 import com.example.core_ui.components.AddFloatingActionButton
 import com.example.core_ui.components.ListItem
@@ -39,9 +43,17 @@ import com.example.core_ui.components.ListItem
 fun ExpensesScreen(
     navigateToHistory: () -> Unit,
     navigateToAddTransaction: () -> Unit,
+    navigateToEditTransaction: (Int) -> Unit,
     viewModel: ExpensesViewModel
 ) {
     val state by viewModel.state.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.handleIntent(ExpensesIntent.Refresh)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -78,6 +90,7 @@ fun ExpensesScreen(
     ) { paddingValues ->
         ExpensesContent(
             state = state,
+            onTransactionClick = navigateToEditTransaction,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -88,6 +101,7 @@ fun ExpensesScreen(
 @Composable
 private fun ExpensesContent(
     state: ExpensesState,
+    onTransactionClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when {
@@ -147,7 +161,7 @@ private fun ExpensesContent(
                             description = expense.comment,
                             trailingIcon = R.drawable.more_vert,
                             onClick = {
-
+                                onTransactionClick(expense.id)
                             },
                             contentPadding = if (expense.comment != null)
                                 PaddingValues(vertical = 16.dp, horizontal = 16.dp)

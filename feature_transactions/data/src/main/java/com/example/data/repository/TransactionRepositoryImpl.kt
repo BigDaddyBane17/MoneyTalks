@@ -2,6 +2,7 @@ package com.example.data.repository
 
 import com.example.data.api.TransactionApiService
 import com.example.data.mappers.TransactionMapper
+import com.example.data.models.TransactionRequestDto
 import com.example.domain.models.Transaction
 import com.example.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,70 @@ class TransactionRepositoryImpl @Inject constructor(
     private val mapper: TransactionMapper
 ) : TransactionRepository {
 
+    override suspend fun createTransaction(
+        accountId: Int,
+        categoryId: Int,
+        amount: String,
+        transactionDate: String,
+        comment: String?
+    ): Result<Unit> {
+        return try {
+            val request = TransactionRequestDto(
+                accountId = accountId,
+                categoryId = categoryId,
+                amount = amount,
+                transactionDate = transactionDate,
+                comment = comment
+            )
+            apiService.createTransaction(request)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getTransactionById(transactionId: Int): Result<Transaction> {
+        return try {
+            val transactionDto = apiService.getTransactionById(transactionId)
+            val transaction = mapper.toDomain(transactionDto)
+            Result.success(transaction)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateTransaction(
+        transactionId: Int,
+        accountId: Int,
+        categoryId: Int,
+        amount: String,
+        transactionDate: String,
+        comment: String?
+    ): Result<Unit> {
+        return try {
+            val request = TransactionRequestDto(
+                accountId = accountId,
+                categoryId = categoryId,
+                amount = amount,
+                transactionDate = transactionDate,
+                comment = comment
+            )
+            apiService.updateTransaction(transactionId, request)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteTransaction(transactionId: Int): Result<Unit> {
+        return try {
+            apiService.deleteTransaction(transactionId)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getExpensesByDate(accountId: Int, date: LocalDate): Flow<List<Transaction>> = flow {
         val startDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
         val endDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -25,12 +90,12 @@ class TransactionRepositoryImpl @Inject constructor(
             endDate = endDate
         )
         
-        // Фильтруем только расходы (категории с isIncome = false)
-        val expenses = transactionsDto
+        // Filter by category type: expenses have isIncome = false
+        val transactions = transactionsDto
             .filter { !it.category.isIncome }
             .map { mapper.toDomain(it) }
         
-        emit(expenses)
+        emit(transactions)
     }
 
     override suspend fun getIncomesByDate(accountId: Int, date: LocalDate): Flow<List<Transaction>> = flow {
@@ -43,47 +108,47 @@ class TransactionRepositoryImpl @Inject constructor(
             endDate = endDate
         )
         
-        // Фильтруем только доходы (категории с isIncome = true)
-        val incomes = transactionsDto
+        // Filter by category type: incomes have isIncome = true
+        val transactions = transactionsDto
             .filter { it.category.isIncome }
             .map { mapper.toDomain(it) }
         
-        emit(incomes)
+        emit(transactions)
     }
 
     override suspend fun getExpensesByDateRange(accountId: Int, startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>> = flow {
-        val startDateStr = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        val endDateStr = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val start = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val end = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
         
         val transactionsDto = apiService.getTransactionsByPeriod(
             accountId = accountId,
-            startDate = startDateStr,
-            endDate = endDateStr
+            startDate = start,
+            endDate = end
         )
         
-        // Фильтруем только расходы (категории с isIncome = false)
-        val expenses = transactionsDto
+        // Filter by category type: expenses have isIncome = false
+        val transactions = transactionsDto
             .filter { !it.category.isIncome }
             .map { mapper.toDomain(it) }
         
-        emit(expenses)
+        emit(transactions)
     }
 
     override suspend fun getIncomesByDateRange(accountId: Int, startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>> = flow {
-        val startDateStr = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        val endDateStr = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val start = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val end = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
         
         val transactionsDto = apiService.getTransactionsByPeriod(
             accountId = accountId,
-            startDate = startDateStr,
-            endDate = endDateStr
+            startDate = start,
+            endDate = end
         )
         
-        // Фильтруем только доходы (категории с isIncome = true)
-        val incomes = transactionsDto
+        // Filter by category type: incomes have isIncome = true
+        val transactions = transactionsDto
             .filter { it.category.isIncome }
             .map { mapper.toDomain(it) }
         
-        emit(incomes)
+        emit(transactions)
     }
 } 

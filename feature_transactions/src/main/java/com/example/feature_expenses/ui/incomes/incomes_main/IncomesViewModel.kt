@@ -3,7 +3,7 @@ package com.example.feature_expenses.ui.incomes.incomes_main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.models.Account
-import com.example.domain.usecase.GetTodayIncomesUseCase
+import com.example.feature_expenses.usecase.GetTodayIncomesUseCase
 import com.example.core.usecase.GetCurrentAccountUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
