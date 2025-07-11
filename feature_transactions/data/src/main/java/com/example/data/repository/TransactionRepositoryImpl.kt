@@ -32,4 +32,58 @@ class TransactionRepositoryImpl @Inject constructor(
         
         emit(expenses)
     }
+
+    override suspend fun getIncomesByDate(accountId: Int, date: LocalDate): Flow<List<Transaction>> = flow {
+        val startDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val endDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        
+        val transactionsDto = apiService.getTransactionsByPeriod(
+            accountId = accountId,
+            startDate = startDate,
+            endDate = endDate
+        )
+        
+        // Фильтруем только доходы (категории с isIncome = true)
+        val incomes = transactionsDto
+            .filter { it.category.isIncome }
+            .map { mapper.toDomain(it) }
+        
+        emit(incomes)
+    }
+
+    override suspend fun getExpensesByDateRange(accountId: Int, startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>> = flow {
+        val startDateStr = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val endDateStr = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        
+        val transactionsDto = apiService.getTransactionsByPeriod(
+            accountId = accountId,
+            startDate = startDateStr,
+            endDate = endDateStr
+        )
+        
+        // Фильтруем только расходы (категории с isIncome = false)
+        val expenses = transactionsDto
+            .filter { !it.category.isIncome }
+            .map { mapper.toDomain(it) }
+        
+        emit(expenses)
+    }
+
+    override suspend fun getIncomesByDateRange(accountId: Int, startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>> = flow {
+        val startDateStr = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        val endDateStr = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        
+        val transactionsDto = apiService.getTransactionsByPeriod(
+            accountId = accountId,
+            startDate = startDateStr,
+            endDate = endDateStr
+        )
+        
+        // Фильтруем только доходы (категории с isIncome = true)
+        val incomes = transactionsDto
+            .filter { it.category.isIncome }
+            .map { mapper.toDomain(it) }
+        
+        emit(incomes)
+    }
 } 

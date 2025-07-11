@@ -1,21 +1,18 @@
 package com.example.feature_expenses.di
 
 import androidx.lifecycle.ViewModelProvider
-import com.example.core.di.ApplicationComponent
+import com.example.core.di.FeatureComponent
 import com.example.data.di.TransactionDataModule
-import com.example.domain.di.TransactionDomainModule
-import com.example.data.di.AccountDataModule
 import dagger.Component
 
 @ExpensesScope
 @Component(
     modules = [
         TransactionDataModule::class,
-        TransactionDomainModule::class,
         ExpensesViewModelModule::class,
-        AccountDataModule::class
+        GetCurrentAccountUseCaseModule::class
     ],
-    dependencies = [ApplicationComponent::class]
+    dependencies = [FeatureComponent::class]
 )
 interface ExpensesComponent {
     
@@ -23,6 +20,8 @@ interface ExpensesComponent {
     
     @Component.Factory
     interface Factory {
-        fun create(applicationComponent: ApplicationComponent): ExpensesComponent
+        fun create(
+            featureComponent: FeatureComponent
+        ): ExpensesComponent
     }
 } 

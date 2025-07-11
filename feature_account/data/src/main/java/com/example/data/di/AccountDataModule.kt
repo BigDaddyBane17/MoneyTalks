@@ -2,7 +2,7 @@ package com.example.data.di
 
 import com.example.data.api.AccountApiService
 import com.example.data.repository.AccountRepositoryImpl
-import com.example.domain.repository.AccountRepository
+import com.example.core.domain.repository.AccountRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

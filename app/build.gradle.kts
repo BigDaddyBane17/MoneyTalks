@@ -89,6 +89,7 @@ dependencies {
 
     implementation(project(":feature_account"))
     implementation(project(":feature_account:data"))
+    implementation(project(":feature_account:data"))
     implementation(project(":feature_account:domain"))
     implementation(project(":feature_categories"))
 

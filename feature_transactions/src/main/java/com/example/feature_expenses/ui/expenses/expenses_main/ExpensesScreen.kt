@@ -47,6 +47,14 @@ fun ExpensesScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Расходы за сегодня") },
+                navigationIcon = {
+                    IconButton(onClick = { viewModel.handleIntent(ExpensesIntent.Refresh) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = "Обновить"
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = navigateToHistory) {
                         Icon(
@@ -139,7 +147,7 @@ private fun ExpensesContent(
                             description = expense.comment,
                             trailingIcon = R.drawable.more_vert,
                             onClick = {
-                                // TODO: Обработка клика по элементу
+
                             },
                             contentPadding = if (expense.comment != null)
                                 PaddingValues(vertical = 16.dp, horizontal = 16.dp)

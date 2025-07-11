@@ -2,8 +2,9 @@ package com.example.feature_expenses.ui.expenses.expenses_main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.domain.models.Account
 import com.example.domain.usecase.GetTodayExpensesUseCase
-import com.example.domain.usecase.GetFirstAccountUseCase
+import com.example.core.usecase.GetCurrentAccountUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,14 +15,15 @@ import javax.inject.Inject
 
 class ExpensesViewModel @Inject constructor(
     private val getTodayExpensesUseCase: GetTodayExpensesUseCase,
-    private val getFirstAccountUseCase: GetFirstAccountUseCase
+    private val getCurrentAccountUseCase: GetCurrentAccountUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ExpensesState())
     val state: StateFlow<ExpensesState> = _state.asStateFlow()
 
     init {
-        handleIntent(ExpensesIntent.LoadTodayExpenses)
+        // Подписываемся на изменения выбранного счета
+        observeSelectedAccount()
     }
 
     fun handleIntent(intent: ExpensesIntent) {
@@ -31,30 +33,55 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
-    private fun loadTodayExpenses() {
+    private fun observeSelectedAccount() {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, error = null)
-            
-            try {
-                // Получаем первый счет
-                val firstAccount = getFirstAccountUseCase()
-                
-                if (firstAccount == null) {
+            getCurrentAccountUseCase().collect { account ->
+                if (account != null) {
+                    loadTodayExpenses(account)
+                } else {
                     _state.value = _state.value.copy(
                         isLoading = false,
                         error = "Нет доступных счетов"
                     )
-                    return@launch
                 }
-                
+            }
+        }
+    }
+
+    private fun loadTodayExpenses() {
+        viewModelScope.launch {
+            try {
+                val currentAccount = getCurrentAccountUseCase.getCurrentAccount()
+                if (currentAccount != null) {
+                    loadTodayExpenses(currentAccount)
+                } else {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = "Нет доступных счетов"
+                    )
+                }
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "Произошла ошибка при загрузке счета"
+                )
+            }
+        }
+    }
+
+    private fun loadTodayExpenses(account: Account) {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true, error = null)
+            
+            try {
                 // Обновляем состояние с информацией о счете
                 _state.value = _state.value.copy(
-                    accountId = firstAccount.id,
-                    currency = firstAccount.currency
+                    accountId = account.id,
+                    currency = account.currency
                 )
                 
                 // Загружаем расходы для этого счета
-                getTodayExpensesUseCase(firstAccount.id)
+                getTodayExpensesUseCase(account.id)
                     .catch { error ->
                         _state.value = _state.value.copy(
                             isLoading = false,
@@ -73,7 +100,7 @@ class ExpensesViewModel @Inject constructor(
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Произошла ошибка при загрузке счета"
+                    error = e.message ?: "Произошла ошибка при загрузке расходов"
                 )
             }
         }
