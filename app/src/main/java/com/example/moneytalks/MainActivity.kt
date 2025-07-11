@@ -5,10 +5,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.moneytalks.ui.theme.MoneyTalksTheme
-import dagger.hilt.android.AndroidEntryPoint
+import com.example.core_ui.theme.MoneyTalksTheme
 
-@AndroidEntryPoint
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

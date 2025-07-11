@@ -4,9 +4,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.detekt)
+    // alias(libs.plugins.detekt)
 }
 
 android {
@@ -55,17 +54,17 @@ android {
 }
 
 dependencies {
-
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.lottie)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.datastore.core.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -81,8 +80,26 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.datetime)
     implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.dagger.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)
-    ksp(libs.dagger.hilt.compiler)
+    implementation(libs.dagger)
+    ksp(libs.dagger.compiler)
+    implementation(libs.androidx.datastore.preferences)
+
+    implementation(project(":core"))
+    implementation(project(":core_ui"))
+
+    implementation(project(":feature_account"))
+    implementation(project(":feature_account:data"))
+    implementation(project(":feature_account:data"))
+    implementation(project(":feature_account:domain"))
+    implementation(project(":feature_categories"))
+
+    implementation(project(":feature_categories:data"))
+    implementation(project(":feature_categories:domain"))
+
+    implementation(project(":feature_transactions"))
+    implementation(project(":feature_transactions:data"))
+    implementation(project(":feature_transactions:domain"))
+
+    implementation(project(":feature_settings"))
 
 }
