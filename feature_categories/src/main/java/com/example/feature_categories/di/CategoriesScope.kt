@@ -1,4 +1,7 @@
 package com.example.feature_categories.di
 
-class CategoriesScope {
-}
+import javax.inject.Scope
+
+@Scope
+@Retention(AnnotationRetention.RUNTIME)
+annotation class CategoriesScope

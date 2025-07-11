@@ -69,8 +69,7 @@ fun NavGraphBuilder.expensesNavGraph(
             val featureComponentProvider = context.applicationContext as FeatureComponentProvider
             val featureComponent = featureComponentProvider.provideFeatureComponent()
             val expensesComponent = DaggerExpensesComponent.factory().create(featureComponent)
-            
-            // Create ViewModel with transactionId parameter
+
             val viewModel = ExpensesEditViewModel(
                 transactionId = transactionId,
                 getTransactionByIdUseCase = expensesComponent.getTransactionByIdUseCase(),

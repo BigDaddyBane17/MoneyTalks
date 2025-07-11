@@ -68,8 +68,7 @@ fun NavGraphBuilder.incomesNavGraph(
             val featureComponentProvider = context.applicationContext as FeatureComponentProvider
             val featureComponent = featureComponentProvider.provideFeatureComponent()
             val incomesComponent = DaggerIncomesComponent.factory().create(featureComponent)
-            
-            // Create ViewModel with transactionId parameter
+
             val viewModel = IncomesEditViewModel(
                 transactionId = transactionId,
                 getTransactionByIdUseCase = incomesComponent.getTransactionByIdUseCase(),

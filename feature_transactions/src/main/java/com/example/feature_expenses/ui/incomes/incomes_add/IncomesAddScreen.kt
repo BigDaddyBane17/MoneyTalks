@@ -98,8 +98,8 @@ fun IncomesAddScreen(
             state.error != null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+            contentAlignment = Alignment.Center
+        ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = state.error!!)
                         Spacer(modifier = Modifier.height(8.dp))
