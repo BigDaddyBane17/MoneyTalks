@@ -37,8 +37,8 @@ class IncomesHistoryViewModel @Inject constructor(
                 // Данные загрузятся автоматически через observeAccountAndDates
             }
             is IncomesHistoryIntent.Refresh -> {
-                // Перезагрузить с текущими параметрами
-                loadHistoryForCurrentState()
+                // Принудительно обновляем данные о текущем счете
+                refreshCurrentAccount()
             }
         }
     }
@@ -65,6 +65,32 @@ class IncomesHistoryViewModel @Inject constructor(
                         accountId = null
                     )
                 }
+            }
+        }
+    }
+
+    private fun refreshCurrentAccount() {
+        viewModelScope.launch {
+            try {
+                val currentAccount = getCurrentAccountUseCase.getCurrentAccount()
+                if (currentAccount != null) {
+                    _state.value = _state.value.copy(
+                        accountId = currentAccount.id,
+                        currency = currentAccount.currency
+                    )
+                    loadHistory(currentAccount.id, _startDate.value, _endDate.value)
+                } else {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = "Нет доступных счетов",
+                        accountId = null
+                    )
+                }
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "Ошибка обновления данных счета"
+                )
             }
         }
     }

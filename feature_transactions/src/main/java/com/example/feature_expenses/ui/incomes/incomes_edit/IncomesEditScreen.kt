@@ -16,6 +16,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.core_ui.R
 import com.example.core_ui.components.ListItem
+import com.example.core.utils.toCurrencySymbol
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -154,7 +155,7 @@ fun IncomesEditScreen(
                                             Column {
                                                 Text(account.name)
                                                 Text(
-                                                    "${account.balance} ${account.currency}",
+                                                    "${account.balance} ${account.currency.toCurrencySymbol()}",
                                                     style = MaterialTheme.typography.bodySmall,
                                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                                 )
@@ -210,7 +211,7 @@ fun IncomesEditScreen(
                             modifier = Modifier,
                             title = "Сумма",
                             amount = if (state.amount.isNotBlank()) {
-                                "${state.amount} ${state.selectedAccount?.currency ?: ""}"
+                                "${state.amount} ${state.selectedAccount?.currency?.toCurrencySymbol() ?: ""}"
                             } else {
                                 "Введите сумму"
                             },

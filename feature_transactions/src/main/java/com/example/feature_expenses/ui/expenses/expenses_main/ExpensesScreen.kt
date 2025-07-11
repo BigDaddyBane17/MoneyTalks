@@ -37,6 +37,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.core_ui.R
 import com.example.core_ui.components.AddFloatingActionButton
 import com.example.core_ui.components.ListItem
+import com.example.core.utils.toCurrencySymbol
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -145,7 +146,7 @@ private fun ExpensesContent(
                 ListItem(
                     modifier = Modifier.height(56.dp),
                     title = "Всего",
-                    currency = state.currency,
+                    currency = state.currency.toCurrencySymbol(),
                     amount = state.totalAmount,
                     backgroundColor = MaterialTheme.colorScheme.surface,
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
@@ -166,7 +167,7 @@ private fun ExpensesContent(
                             contentPadding = if (expense.comment != null)
                                 PaddingValues(vertical = 16.dp, horizontal = 16.dp)
                             else PaddingValues(vertical = 24.dp, horizontal = 16.dp),
-                            currency = state.currency,
+                            currency = state.currency.toCurrencySymbol(),
                             modifier = Modifier
                         )
                         HorizontalDivider()

@@ -34,9 +34,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.core_ui.R
 import com.example.core_ui.components.CustomDatePickerDialog
 import com.example.core_ui.components.ListItem
+import com.example.core.utils.toCurrencySymbol
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +56,7 @@ fun IncomesHistoryScreen(
     var showDialog by remember { mutableStateOf(false) }
 
     val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'г.'", Locale("ru"))
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     LaunchedEffect(startDate, endDate) {
         viewModel.handleIntent(
@@ -62,14 +67,15 @@ fun IncomesHistoryScreen(
         )
     }
 
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.handleIntent(IncomesHistoryIntent.Refresh)
+        }
+    }
+
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    val currencySymbol = when (uiState.currency) {
-        "EUR" -> "€"
-        "USD" -> "$"
-        "RUB" -> "₽"
-        else -> ""
-    }
+    val currencySymbol = uiState.currency.toCurrencySymbol()
 
     Scaffold(
         topBar = {
