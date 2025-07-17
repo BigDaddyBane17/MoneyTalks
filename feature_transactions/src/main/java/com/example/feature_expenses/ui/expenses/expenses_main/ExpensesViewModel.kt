@@ -41,7 +41,7 @@ class ExpensesViewModel @Inject constructor(
                 } else {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = "Нет доступных счетов"
+                        error = "Нет доступных счетов. Проверьте подключение к интернету."
                     )
                 }
             }
@@ -57,13 +57,13 @@ class ExpensesViewModel @Inject constructor(
                 } else {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = "Нет доступных счетов"
+                        error = "Нет доступных счетов. Проверьте подключение к интернету."
                     )
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Произошла ошибка при загрузке счета"
+                    error = "Ошибка загрузки данных: ${e.message ?: "Проверьте подключение к интернету"}"
                 )
             }
         }
@@ -74,18 +74,18 @@ class ExpensesViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true, error = null)
             
             try {
-                // Обновляем состояние с информацией о счете
+
                 _state.value = _state.value.copy(
                     accountId = account.id,
                     currency = account.currency
                 )
                 
-                // Загружаем расходы для этого счета
+
                 getTodayExpensesUseCase(account.id)
                     .catch { error ->
                         _state.value = _state.value.copy(
                             isLoading = false,
-                            error = error.message ?: "Произошла ошибка"
+                            error = "Ошибка загрузки расходов: ${error.message ?: "Проверьте подключение к интернету"}"
                         )
                     }
                     .collect { expenses ->
@@ -100,7 +100,7 @@ class ExpensesViewModel @Inject constructor(
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Произошла ошибка при загрузке расходов"
+                    error = "Ошибка загрузки расходов: ${e.message ?: "Проверьте подключение к интернету"}"
                 )
             }
         }

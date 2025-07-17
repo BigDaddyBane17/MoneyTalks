@@ -40,7 +40,7 @@ class IncomesViewModel @Inject constructor(
                 } else {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = "Нет доступных счетов"
+                        error = "Нет доступных счетов. Проверьте подключение к интернету."
                     )
                 }
             }
@@ -56,13 +56,13 @@ class IncomesViewModel @Inject constructor(
                 } else {
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = "Нет доступных счетов"
+                        error = "Нет доступных счетов. Проверьте подключение к интернету."
                     )
                 }
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Произошла ошибка при загрузке счета"
+                    error = "Ошибка загрузки данных: ${e.message ?: "Проверьте подключение к интернету"}"
                 )
             }
         }
@@ -81,7 +81,7 @@ class IncomesViewModel @Inject constructor(
                     .catch { error ->
                         _state.value = _state.value.copy(
                             isLoading = false,
-                            error = error.message ?: "Произошла ошибка"
+                            error = "Ошибка загрузки доходов: ${error.message ?: "Проверьте подключение к интернету"}"
                         )
                     }
                     .collect { incomes ->
@@ -96,7 +96,7 @@ class IncomesViewModel @Inject constructor(
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Произошла ошибка при загрузке доходов"
+                    error = "Ошибка загрузки доходов: ${e.message ?: "Проверьте подключение к интернету"}"
                 )
             }
         }

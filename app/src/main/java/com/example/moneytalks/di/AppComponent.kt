@@ -1,7 +1,6 @@
 package com.example.moneytalks.di
 
 import android.content.Context
-import com.example.core.di.ApplicationComponent
 import com.example.core.di.FeatureComponent
 import com.example.core.di.NetworkModule
 import com.example.core.di.PrefsModule

@@ -12,7 +12,12 @@ class AccountRepositoryImpl @Inject constructor(
 ) : AccountRepository {
     
     override suspend fun getAccounts(): List<Account> {
-        return apiService.getAccounts().map { mapper.toDomain(it) }
+        return try {
+            apiService.getAccounts().map { mapper.toDomain(it) }
+        } catch (e: Exception) {
+            // Возвращаем пустой список при сетевых ошибках
+            emptyList()
+        }
     }
     
     override suspend fun getAccountById(id: Int): Account? {
@@ -30,18 +35,23 @@ class AccountRepositoryImpl @Inject constructor(
     }
     
     override suspend fun updateAccount(account: Account): Account {
-        val updateRequest = com.example.data.models.AccountUpdateRequestDto(
-            name = account.name,
-            currency = account.currency,
-            balance = account.balance
-        )
-        val updatedDto = apiService.updateAccountById(account.id, updateRequest)
-        return Account(
-            id = updatedDto.id,
-            name = updatedDto.name,
-            balance = updatedDto.balance,
-            currency = updatedDto.currency
-        )
+        return try {
+            val updateRequest = com.example.data.models.AccountUpdateRequestDto(
+                name = account.name,
+                currency = account.currency,
+                balance = account.balance
+            )
+            val updatedDto = apiService.updateAccountById(account.id, updateRequest)
+            Account(
+                id = updatedDto.id,
+                name = updatedDto.name,
+                balance = updatedDto.balance,
+                currency = updatedDto.currency
+            )
+        } catch (e: Exception) {
+            // Возвращаем исходный аккаунт при ошибке
+            account
+        }
     }
 
 }

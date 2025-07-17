@@ -81,74 +81,88 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getExpensesByDate(accountId: Int, date: LocalDate): Flow<List<Transaction>> = flow {
-        val startDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        val endDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        
-        val transactionsDto = apiService.getTransactionsByPeriod(
-            accountId = accountId,
-            startDate = startDate,
-            endDate = endDate
-        )
-        
-        // Filter by category type: expenses have isIncome = false
-        val transactions = transactionsDto
-            .filter { !it.category.isIncome }
-            .map { mapper.toDomain(it) }
-        
-        emit(transactions)
+        try {
+            val startDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val endDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            
+            val transactionsDto = apiService.getTransactionsByPeriod(
+                accountId = accountId,
+                startDate = startDate,
+                endDate = endDate
+            )
+
+            val transactions = transactionsDto
+                .filter { !it.category.isIncome }
+                .map { mapper.toDomain(it) }
+            
+            emit(transactions)
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
     }
 
     override suspend fun getIncomesByDate(accountId: Int, date: LocalDate): Flow<List<Transaction>> = flow {
-        val startDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        val endDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        
-        val transactionsDto = apiService.getTransactionsByPeriod(
-            accountId = accountId,
-            startDate = startDate,
-            endDate = endDate
-        )
-        
-        // Filter by category type: incomes have isIncome = true
-        val transactions = transactionsDto
-            .filter { it.category.isIncome }
-            .map { mapper.toDomain(it) }
-        
-        emit(transactions)
+        try {
+            val startDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val endDate = date.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            
+            val transactionsDto = apiService.getTransactionsByPeriod(
+                accountId = accountId,
+                startDate = startDate,
+                endDate = endDate
+            )
+
+            val transactions = transactionsDto
+                .filter { it.category.isIncome }
+                .map { mapper.toDomain(it) }
+            
+            emit(transactions)
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
     }
 
     override suspend fun getExpensesByDateRange(accountId: Int, startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>> = flow {
-        val start = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        val end = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        
-        val transactionsDto = apiService.getTransactionsByPeriod(
-            accountId = accountId,
-            startDate = start,
-            endDate = end
-        )
-        
-        // Filter by category type: expenses have isIncome = false
-        val transactions = transactionsDto
-            .filter { !it.category.isIncome }
-            .map { mapper.toDomain(it) }
-        
-        emit(transactions)
+        try {
+            val start = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val end = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            
+            val transactionsDto = apiService.getTransactionsByPeriod(
+                accountId = accountId,
+                startDate = start,
+                endDate = end
+            )
+
+            val transactions = transactionsDto
+                .filter { !it.category.isIncome }
+                .map { mapper.toDomain(it) }
+            
+            emit(transactions)
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
     }
 
     override suspend fun getIncomesByDateRange(accountId: Int, startDate: LocalDate, endDate: LocalDate): Flow<List<Transaction>> = flow {
-        val start = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        val end = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        
-        val transactionsDto = apiService.getTransactionsByPeriod(
-            accountId = accountId,
-            startDate = start,
-            endDate = end
-        )
-        
-        // Filter by category type: incomes have isIncome = true
-        val transactions = transactionsDto
-            .filter { it.category.isIncome }
-            .map { mapper.toDomain(it) }
-        
-        emit(transactions)
+        try {
+            val start = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            val end = endDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            
+            val transactionsDto = apiService.getTransactionsByPeriod(
+                accountId = accountId,
+                startDate = start,
+                endDate = end
+            )
+            
+            // Filter by category type: incomes have isIncome = true
+            val transactions = transactionsDto
+                .filter { it.category.isIncome }
+                .map { mapper.toDomain(it) }
+            
+            emit(transactions)
+        } catch (e: Exception) {
+            // При сетевых ошибках возвращаем пустой список
+            emit(emptyList())
+        }
     }
 } 
