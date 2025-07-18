@@ -15,4 +15,7 @@ interface CategoryDao {
 
     @Query("DELETE FROM categories")
     suspend fun clearAll()
+
+    @Query("SELECT * FROM categories WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Int): CategoryEntity?
 }

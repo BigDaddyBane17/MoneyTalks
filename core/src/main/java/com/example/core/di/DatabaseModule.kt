@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.core.data.dao.AccountDao
 import com.example.core.data.dao.CategoryDao
+import com.example.core.data.dao.TransactionDao
 import com.example.core.data.database.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -26,4 +27,7 @@ object DatabaseModule {
 
     @Provides
     fun provideAccountDao(db: AppDatabase): AccountDao = db.accountDao()
+
+    @Provides
+    fun provideTransactionDao(db: AppDatabase): TransactionDao = db.transactionDao()
 }
