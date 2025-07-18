@@ -103,8 +103,12 @@ class ExpensesHistoryViewModel @Inject constructor(
 
     private fun loadHistory(accountId: Int, startDate: LocalDate, endDate: LocalDate) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, error = null)
-            
+            // Показываем лоадер только если данных ещё нет
+            if (_state.value.expenses.isEmpty()) {
+                _state.value = _state.value.copy(isLoading = true, error = null)
+            } else {
+                _state.value = _state.value.copy(isLoading = false, error = null)
+            }
             try {
                 getHistoryExpensesUseCase(accountId, startDate, endDate)
                     .catch { exception ->

@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import javax.inject.Inject
@@ -35,16 +37,12 @@ class ExpensesViewModel @Inject constructor(
 
     private fun observeSelectedAccount() {
         viewModelScope.launch {
-            getCurrentAccountUseCase().collect { account ->
-                if (account != null) {
+            getCurrentAccountUseCase()
+                .filterNotNull()
+                .distinctUntilChanged()
+                .collect { account ->
                     loadTodayExpenses(account)
-                } else {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = "Нет доступных счетов. Проверьте подключение к интернету."
-                    )
                 }
-            }
         }
     }
 
@@ -71,16 +69,17 @@ class ExpensesViewModel @Inject constructor(
 
     private fun loadTodayExpenses(account: Account) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, error = null)
-            
+            // Показываем лоадер только если данных ещё нет
+            if (_state.value.expenses.isEmpty()) {
+                _state.value = _state.value.copy(isLoading = true, error = null)
+            } else {
+                _state.value = _state.value.copy(isLoading = false, error = null)
+            }
             try {
-
                 _state.value = _state.value.copy(
                     accountId = account.id,
                     currency = account.currency
                 )
-                
-
                 getTodayExpensesUseCase(account.id)
                     .catch { error ->
                         _state.value = _state.value.copy(

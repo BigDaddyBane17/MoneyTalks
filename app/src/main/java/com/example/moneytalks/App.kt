@@ -5,7 +5,10 @@ import com.example.core.di.ApplicationComponent
 import com.example.core.di.ComponentProvider
 import com.example.core.di.FeatureComponent
 import com.example.core.di.FeatureComponentProvider
+
 import com.example.moneytalks.di.DaggerAppComponent
+
+
 
 class App : Application(), ComponentProvider, FeatureComponentProvider {
     
@@ -19,5 +22,9 @@ class App : Application(), ComponentProvider, FeatureComponentProvider {
     
     override fun provideFeatureComponent(): FeatureComponent {
         return appComponent
+    }
+
+    override fun onCreate() {
+        super.onCreate()
     }
 }

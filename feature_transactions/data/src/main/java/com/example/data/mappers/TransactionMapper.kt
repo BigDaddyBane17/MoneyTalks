@@ -1,6 +1,9 @@
 package com.example.data.mappers
 
+import com.example.core.data.entities.AccountEntity
+import com.example.core.data.entities.CategoryEntity
 import com.example.core.data.entities.TransactionEntity
+import com.example.data.models.TransactionDto
 import com.example.data.models.TransactionRequestDto
 import com.example.data.models.TransactionResponseDto
 import com.example.domain.models.Transaction
@@ -24,6 +27,31 @@ fun String.parseDateTime(): LocalDateTime {
         }
     }
 }
+
+fun TransactionDto.toEntity(
+    accountName: String,
+    categoryName: String,
+    categoryEmoji: String,
+    isIncome: Boolean
+): TransactionEntity = TransactionEntity(
+    id = id,
+    accountId = accountId,
+    accountName = accountName,
+    categoryId = categoryId,
+    categoryName = categoryName,
+    categoryEmoji = categoryEmoji,
+    isIncome = isIncome,
+    amount = amount,
+    transactionDate = transactionDate,
+    comment = comment,
+    isSynced = true,
+    isDeleted = false,
+    lastModified = updatedAt.parseDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
+    serverVersion = updatedAt.parseDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+)
+
+
+
 
 fun TransactionResponseDto.toEntity(): TransactionEntity =
     TransactionEntity(

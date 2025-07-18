@@ -51,7 +51,6 @@ class AccountViewModel @Inject constructor(
             try {
                 val accounts = accountRepository.getAccounts()
                 if (accounts.isNotEmpty()) {
-                    // Загружаем сохраненный ID счета или выбираем первый
                     if (selectedAccountId == null) {
                         val currentAccount = getCurrentAccountUseCase.getCurrentAccount()
                         selectedAccountId = currentAccount?.id ?: accounts.first().id

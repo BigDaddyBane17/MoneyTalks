@@ -55,21 +55,20 @@ class IncomesEditViewModel @Inject constructor(
     private fun loadInitialData() {
         viewModelScope.launch {
             try {
-                _state.value = _state.value.copy(isLoading = true, error = null)
-
+                if (_state.value.amount.isBlank() && _state.value.selectedAccount == null && _state.value.selectedCategory == null) {
+                    _state.value = _state.value.copy(isLoading = true, error = null)
+                } else {
+                    _state.value = _state.value.copy(isLoading = false, error = null)
+                }
                 val accountsDeferred = async { accountRepository.getAccounts() }
                 val categoriesDeferred = async { categoryRepository.getCategoriesByType(true) }
-                
                 val accounts = accountsDeferred.await()
                 val categories = categoriesDeferred.await()
-                
                 _state.value = _state.value.copy(
                     accounts = accounts,
                     categories = categories
                 )
-
                 loadTransaction()
-                
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
