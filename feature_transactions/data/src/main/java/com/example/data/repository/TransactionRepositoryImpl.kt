@@ -161,7 +161,6 @@ class TransactionRepositoryImpl @Inject constructor(
             
             emit(transactions)
         } catch (e: Exception) {
-            // При сетевых ошибках возвращаем пустой список
             emit(emptyList())
         }
     }

@@ -1,39 +1,42 @@
 package com.example.data.repository
 
+import com.example.core.data.dao.AccountDao
 import com.example.data.api.AccountApiService
-import com.example.data.mappers.AccountMapper
 import com.example.core.domain.models.Account
 import com.example.core.domain.repository.AccountRepository
+import com.example.data.mappers.toDomain
+import com.example.data.mappers.toEntity
 import javax.inject.Inject
 
 class AccountRepositoryImpl @Inject constructor(
     private val apiService: AccountApiService,
-    private val mapper: AccountMapper
+    private val accountDao: AccountDao
 ) : AccountRepository {
-    
+
     override suspend fun getAccounts(): List<Account> {
+        val cached = accountDao.getAll().map { it.toDomain() }
         return try {
-            apiService.getAccounts().map { mapper.toDomain(it) }
+            val remote = apiService.getAccounts()
+            val entities = remote.map { it.toEntity() }
+            accountDao.insertAll(entities)
+            entities.map { it.toDomain() }
         } catch (e: Exception) {
-            // Возвращаем пустой список при сетевых ошибках
-            emptyList()
+            cached
         }
     }
-    
+
     override suspend fun getAccountById(id: Int): Account? {
+        val cached = accountDao.getById(id)?.toDomain()
         return try {
             val response = apiService.getAccountById(id)
-            Account(
-                id = response.id,
-                name = response.name,
-                balance = response.balance,
-                currency = response.currency
-            )
+            val entity = response.toEntity()
+            accountDao.insert(entity)
+            entity.toDomain()
         } catch (e: Exception) {
-            null
+            cached
         }
     }
-    
+
     override suspend fun updateAccount(account: Account): Account {
         return try {
             val updateRequest = com.example.data.models.AccountUpdateRequestDto(
@@ -42,14 +45,10 @@ class AccountRepositoryImpl @Inject constructor(
                 balance = account.balance
             )
             val updatedDto = apiService.updateAccountById(account.id, updateRequest)
-            Account(
-                id = updatedDto.id,
-                name = updatedDto.name,
-                balance = updatedDto.balance,
-                currency = updatedDto.currency
-            )
+            val updatedEntity = updatedDto.toEntity()
+            accountDao.insert(updatedEntity)
+            updatedEntity.toDomain()
         } catch (e: Exception) {
-            // Возвращаем исходный аккаунт при ошибке
             account
         }
     }
