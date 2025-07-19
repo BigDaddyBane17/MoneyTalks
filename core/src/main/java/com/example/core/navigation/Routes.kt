@@ -25,7 +25,6 @@ object Routes {
     const val CATEGORIES = "статьи"
     const val SETTINGS = "настройки"
     
-    // Helper functions to create routes with parameters
     fun expensesEdit(transactionId: Int) = "расходы_редактировать/$transactionId"
     fun earningsEdit(transactionId: Int) = "доходы_редактировать/$transactionId"
 }

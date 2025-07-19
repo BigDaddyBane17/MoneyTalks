@@ -22,7 +22,7 @@ interface ApplicationComponent {
     fun context(): Context
     fun userPreferences(): UserPreferences
     fun selectedAccountRepository(): SelectedAccountRepository
-    
+
     @Component.Factory
     interface Factory {
         fun create(@BindsInstance context: Context): ApplicationComponent

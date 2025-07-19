@@ -17,6 +17,4 @@ data class TransactionEntity(
     val comment: String?,
     val isSynced: Boolean = false,
     val isDeleted: Boolean = false,
-    val lastModified: Long = System.currentTimeMillis(),
-    val serverVersion: Long? = null
 )

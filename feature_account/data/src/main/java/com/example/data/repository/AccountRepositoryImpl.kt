@@ -6,6 +6,7 @@ import com.example.core.domain.models.Account
 import com.example.core.domain.repository.AccountRepository
 import com.example.data.mappers.toDomain
 import com.example.data.mappers.toEntity
+import com.example.data.models.AccountUpdateRequestDto
 import javax.inject.Inject
 
 class AccountRepositoryImpl @Inject constructor(
@@ -39,7 +40,7 @@ class AccountRepositoryImpl @Inject constructor(
 
     override suspend fun updateAccount(account: Account): Account {
         return try {
-            val updateRequest = com.example.data.models.AccountUpdateRequestDto(
+            val updateRequest = AccountUpdateRequestDto(
                 name = account.name,
                 currency = account.currency,
                 balance = account.balance

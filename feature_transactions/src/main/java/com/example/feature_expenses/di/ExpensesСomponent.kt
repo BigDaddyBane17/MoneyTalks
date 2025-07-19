@@ -24,7 +24,6 @@ interface ExpensesComponent {
     
     fun viewModelFactory(): ViewModelProvider.Factory
     
-    // Provide dependencies for manual ViewModel creation
     fun getTransactionByIdUseCase(): GetTransactionByIdUseCase
     fun updateTransactionUseCase(): UpdateTransactionUseCase
     fun deleteTransactionUseCase(): DeleteTransactionUseCase

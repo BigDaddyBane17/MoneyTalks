@@ -54,21 +54,21 @@ object TransactionUseCaseModule {
 
     @Provides
     fun provideGetTransactionByIdUseCase(
-        transactionRepository: com.example.domain.repository.TransactionRepository
+        transactionRepository: TransactionRepository
     ): GetTransactionByIdUseCase {
         return GetTransactionByIdUseCase(transactionRepository)
     }
 
     @Provides
     fun provideUpdateTransactionUseCase(
-        transactionRepository: com.example.domain.repository.TransactionRepository
+        transactionRepository: TransactionRepository
     ): UpdateTransactionUseCase {
         return UpdateTransactionUseCase(transactionRepository)
     }
 
     @Provides
     fun provideDeleteTransactionUseCase(
-        transactionRepository: com.example.domain.repository.TransactionRepository
+        transactionRepository: TransactionRepository
     ): DeleteTransactionUseCase {
         return DeleteTransactionUseCase(transactionRepository)
     }

@@ -1,7 +1,5 @@
 package com.example.data.mappers
 
-import com.example.core.data.entities.AccountEntity
-import com.example.core.data.entities.CategoryEntity
 import com.example.core.data.entities.TransactionEntity
 import com.example.data.models.TransactionDto
 import com.example.data.models.TransactionRequestDto
@@ -46,8 +44,6 @@ fun TransactionDto.toEntity(
     comment = comment,
     isSynced = true,
     isDeleted = false,
-    lastModified = updatedAt.parseDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-    serverVersion = updatedAt.parseDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 )
 
 
@@ -67,8 +63,6 @@ fun TransactionResponseDto.toEntity(): TransactionEntity =
         comment = this.comment,
         isSynced = true,
         isDeleted = false,
-        lastModified = this.updatedAt.parseDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-        serverVersion = this.updatedAt.parseDateTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
     )
 
 fun TransactionEntity.toDomain(): Transaction = Transaction(
