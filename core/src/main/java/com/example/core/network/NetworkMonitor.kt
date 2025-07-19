@@ -1,4 +1,4 @@
-package com.example.core.utils
+package com.example.core.network
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -30,4 +30,4 @@ object NetworkMonitor {
         trySend(activeNetwork?.isConnected == true)
         awaitClose { connectivityManager.unregisterNetworkCallback(callback) }
     }
-}
+} 

@@ -12,7 +12,7 @@ import com.example.core.data.entities.TransactionEntity
 @Database(
     entities = [CategoryEntity::class, AccountEntity::class, TransactionEntity::class],
     version = 1,
-    exportSchema = true
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao

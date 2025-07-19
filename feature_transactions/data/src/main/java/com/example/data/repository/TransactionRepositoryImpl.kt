@@ -1,13 +1,14 @@
 package com.example.data.repository
 
+import android.content.Context
 import com.example.core.data.dao.AccountDao
 import com.example.core.data.dao.CategoryDao
 import com.example.core.data.dao.TransactionDao
 import com.example.core.data.entities.TransactionEntity
+import com.example.core.sync.SyncManager
 import com.example.data.api.TransactionApiService
 import com.example.data.mappers.toDomain
 import com.example.data.mappers.toEntity
-import com.example.data.mappers.toRequestDto
 import com.example.data.models.TransactionRequestDto
 import com.example.domain.models.Transaction
 import com.example.domain.repository.TransactionRepository
@@ -24,7 +25,8 @@ class TransactionRepositoryImpl @Inject constructor(
     private val apiService: TransactionApiService,
     private val transactionDao: TransactionDao,
     private val categoryDao: CategoryDao,
-    private val accountDao: AccountDao
+    private val accountDao: AccountDao,
+    private val context: Context
 ) : TransactionRepository {
 
     private fun generateLocalId(): Int = -(System.currentTimeMillis() % Int.MAX_VALUE).toInt()
@@ -37,6 +39,8 @@ class TransactionRepositoryImpl @Inject constructor(
         transactionDate: String,
         comment: String?
     ): Result<Unit> {
+        android.util.Log.d("TransactionRepo", "Создаем транзакцию: accountId=$accountId, amount=$amount")
+        
         val account = accountDao.getById(accountId)
             ?: return Result.failure(Exception("Account not found"))
         val category = categoryDao.getById(categoryId)
@@ -49,7 +53,9 @@ class TransactionRepositoryImpl @Inject constructor(
             comment = comment
         )
         return try {
+            android.util.Log.d("TransactionRepo", "Пытаемся создать транзакцию на сервере")
             val response = apiService.createTransaction(request)
+            android.util.Log.d("TransactionRepo", "Транзакция создана на сервере: ID=${response.id}")
             transactionDao.insert(response.toEntity(
                 accountName = account.name,
                 categoryName = category.name,
@@ -57,9 +63,13 @@ class TransactionRepositoryImpl @Inject constructor(
                 isIncome = category.isIncome
             ))
             Result.success(Unit)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            android.util.Log.w("TransactionRepo", "Ошибка создания на сервере: ${e.message}, создаем локально")
+            val localId = generateLocalId()
+            android.util.Log.d("TransactionRepo", "Создаем локальную транзакцию с ID: $localId")
+            
             val entity = TransactionEntity(
-                id = generateLocalId(),
+                id = localId,
                 accountId = accountId,
                 accountName = account.name,
                 categoryId = categoryId,
@@ -73,6 +83,17 @@ class TransactionRepositoryImpl @Inject constructor(
                 isDeleted = false,
             )
             transactionDao.insert(entity)
+            android.util.Log.d("TransactionRepo", "Локальная транзакция сохранена, isSynced=false")
+            
+            // Запускаем синхронизацию
+            try {
+                val syncManager = SyncManager(context)
+                android.util.Log.d("TransactionRepo", "Запускаем синхронизацию после создания локальной транзакции")
+                syncManager.startPeriodicSync()
+            } catch (e: Exception) {
+                android.util.Log.e("TransactionRepo", "Ошибка запуска синхронизации: ${e.message}")
+            }
+            
             Result.success(Unit)
         }
     }

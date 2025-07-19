@@ -24,4 +24,12 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE accountId = :accountId AND date(transactionDate) BETWEEN :start AND :end AND isIncome = :isIncome AND isDeleted = 0")
     fun getByAccountAndDateRange(accountId: Int, start: String, end: String, isIncome: Boolean): Flow<List<TransactionEntity>>
 
+    @Query("SELECT * FROM transactions WHERE isSynced = 0 OR (isDeleted = 1 AND isSynced = 0)")
+    suspend fun getUnsyncedTransactions(): List<TransactionEntity>
+
+    @Query("SELECT COUNT(*) FROM transactions WHERE isSynced = 0 OR (isDeleted = 1 AND isSynced = 0)")
+    suspend fun getUnsyncedTransactionsCount(): Int
+
+    @Query("DELETE FROM transactions WHERE id = :id")
+    suspend fun deleteById(id: Int)
 }
