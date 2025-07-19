@@ -1,5 +1,6 @@
 package com.example.data.di
 
+import com.example.core.di.DatabaseModule
 import com.example.core.domain.repository.CategoryRepository
 import com.example.data.api.CategoryApiService
 import com.example.data.repository.CategoryRepositoryImpl
@@ -8,7 +9,10 @@ import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
 
-@Module
+
+@Module(
+    includes = [DatabaseModule::class]
+)
 abstract class CategoryDataModule {
 
     @Binds

@@ -60,11 +60,11 @@ fun AccountScreen(
     val currencies = CurrencyProvider.supportedCurrencies
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.handleIntent(AccountIntent.Refresh)
-        }
-    }
+//    LaunchedEffect(lifecycleOwner) {
+//        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+//            viewModel.handleIntent(AccountIntent.Refresh)
+//        }
+//    }
 
     val accounts = when (val state = uiState) {
         is AccountUiState.Success -> state.accounts

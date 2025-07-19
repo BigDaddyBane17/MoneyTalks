@@ -20,6 +20,9 @@ import com.example.feature_expenses.ui.expenses.expenses_main.ExpensesScreen
 import com.example.feature_expenses.ui.expenses.expenses_main.ExpensesViewModel
 import com.example.feature_expenses.di.DaggerExpensesComponent
 import com.example.core.di.FeatureComponentProvider
+import com.example.feature_expenses.ui.expenses.expenses_analysis.ExpensesAnalysisScreen
+import com.example.feature_expenses.ui.expenses.expenses_analysis.ExpensesAnalysisState
+import com.example.feature_expenses.ui.expenses.expenses_analysis.ExpensesAnalysisViewModel
 
 fun NavGraphBuilder.expensesNavGraph(
     navController: NavHostController
@@ -94,7 +97,21 @@ fun NavGraphBuilder.expensesNavGraph(
             val viewModel: ExpensesHistoryViewModel = viewModel(factory = viewModelFactory)
             
             ExpensesHistoryScreen(
-                navigateToAnalysis = { /* TODO: Implement analysis navigation */ },
+                navigateToAnalysis = { navController.navigate(Routes.EXPENSES_ANALYSIS) },
+                navigateBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
+        }
+
+        composable(Routes.EXPENSES_ANALYSIS) {
+            val context = LocalContext.current
+            val featureComponentProvider = context.applicationContext as FeatureComponentProvider
+            val featureComponent = featureComponentProvider.provideFeatureComponent()
+            val expensesComponent = DaggerExpensesComponent.factory().create(featureComponent)
+            val viewModelFactory = expensesComponent.viewModelFactory()
+            val viewModel: ExpensesAnalysisViewModel = viewModel(factory = viewModelFactory)
+
+            ExpensesAnalysisScreen(
                 navigateBack = { navController.popBackStack() },
                 viewModel = viewModel
             )

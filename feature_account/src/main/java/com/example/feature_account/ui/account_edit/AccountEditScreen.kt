@@ -189,16 +189,7 @@ fun AccountEditScreen(
                             }
                         )
                     }
-
-                    HorizontalDivider()
-
-                    // Информация о валюте (только чтение)
-                    ListItem(
-                        title = "Валюта",
-                        amount = state.currency.toCurrencySymbol(),
-                        backgroundColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                        modifier = Modifier
-                    )
+                    
                 }
             }
         }

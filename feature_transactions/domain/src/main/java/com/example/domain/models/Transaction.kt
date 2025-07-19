@@ -9,5 +9,6 @@ data class Transaction(
     val categoryEmoji: String,
     val amount: String,
     val transactionDate: LocalDateTime,
-    val comment: String?
-) 
+    val comment: String?,
+    val isIncome: Boolean
+)

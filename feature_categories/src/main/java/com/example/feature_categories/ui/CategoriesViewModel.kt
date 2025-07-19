@@ -2,6 +2,7 @@ package com.example.feature_categories.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.domain.models.Category
 import com.example.core.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,7 @@ class CategoryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CategoryUiState())
     val uiState: StateFlow<CategoryUiState> = _uiState.asStateFlow()
 
-    private var allCategories: List<com.example.core.domain.models.Category> = emptyList()
+    private var allCategories: List<Category> = emptyList()
 
     init {
         handleIntent(CategoryIntent.LoadCategories)
@@ -40,7 +41,7 @@ class CategoryViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Ошибка загрузки категорий"
+                    error = "Ошибка загрузки категорий: ${e.message ?: "Проверьте подключение к интернету"}"
                 )
             }
         }

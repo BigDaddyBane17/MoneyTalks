@@ -1,46 +1,98 @@
 package com.example.data.mappers
 
+import com.example.core.data.entities.TransactionEntity
+import com.example.data.models.TransactionDto
+import com.example.data.models.TransactionRequestDto
 import com.example.data.models.TransactionResponseDto
 import com.example.domain.models.Transaction
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.inject.Inject
+import java.time.*
 
-class TransactionMapper @Inject constructor() {
-    
-    fun toDomain(dto: TransactionResponseDto): Transaction {
-        return Transaction(
-            id = dto.id,
-            accountName = dto.account.name,
-            categoryName = dto.category.name,
-            categoryEmoji = dto.category.emoji,
-            amount = dto.amount,
-            transactionDate = parseDateTime(dto.transactionDate),
-            comment = dto.comment
-        )
-    }
-    
-    private fun parseDateTime(dateString: String): LocalDateTime {
-        return try {
-            // Сначала пробуем парсить как ISO_LOCAL_DATE_TIME (без часового пояса)
-            LocalDateTime.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        } catch (e: Exception) {
+fun String.parseDateTime(): LocalDateTime {
+    return try {
+        LocalDateTime.parse(this, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+    } catch (e: Exception) {
+        try {
+            ZonedDateTime.parse(this, DateTimeFormatter.ISO_DATE_TIME).toLocalDateTime()
+        } catch (e2: Exception) {
             try {
-                // Если не получилось, пробуем как ISO_DATE_TIME с часовым поясом
-                val zonedDateTime = java.time.ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME)
-                // Конвертируем в локальное время
-                zonedDateTime.toLocalDateTime()
-            } catch (e2: Exception) {
-                try {
-                    // Еще один вариант - ISO_INSTANT (2025-07-10T10:52:11.058Z)
-                    val instant = java.time.Instant.parse(dateString)
-                    // Конвертируем в локальное время используя системный часовой пояс
-                    LocalDateTime.ofInstant(instant, java.time.ZoneId.systemDefault())
-                } catch (e3: Exception) {
-                    // Последняя попытка - заменяем пробелы на T
-                    LocalDateTime.parse(dateString.replace(" ", "T"))
-                }
+                val instant = Instant.parse(this)
+                LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+            } catch (e3: Exception) {
+                LocalDateTime.parse(this.replace(" ", "T"))
             }
         }
     }
-} 
+}
+
+fun TransactionDto.toEntity(
+    accountName: String,
+    categoryName: String,
+    categoryEmoji: String,
+    isIncome: Boolean
+): TransactionEntity = TransactionEntity(
+    id = id,
+    accountId = accountId,
+    accountName = accountName,
+    categoryId = categoryId,
+    categoryName = categoryName,
+    categoryEmoji = categoryEmoji,
+    isIncome = isIncome,
+    amount = amount,
+    transactionDate = transactionDate,
+    comment = comment,
+    isSynced = true,
+    isDeleted = false,
+)
+
+
+
+
+fun TransactionResponseDto.toEntity(): TransactionEntity =
+    TransactionEntity(
+        id = this.id,
+        accountId = this.account.id,
+        accountName = this.account.name,
+        categoryId = this.category.id,
+        categoryName = this.category.name,
+        categoryEmoji = this.category.emoji,
+        isIncome = this.category.isIncome,
+        amount = this.amount,
+        transactionDate = this.transactionDate,
+        comment = this.comment,
+        isSynced = true,
+        isDeleted = false,
+    )
+
+fun TransactionEntity.toDomain(): Transaction = Transaction(
+    id = id,
+    accountName = accountName,
+    categoryName = categoryName,
+    categoryEmoji = categoryEmoji,
+    amount = amount,
+    transactionDate = transactionDate.parseDateTime(),
+    comment = comment,
+    isIncome = isIncome
+)
+
+fun TransactionEntity.toRequestDto(): TransactionRequestDto =
+    TransactionRequestDto(
+        accountId = accountId,
+        categoryId = categoryId,
+        amount = amount,
+        transactionDate = transactionDate,
+        comment = comment
+    )
+
+fun TransactionResponseDto.toDomain(): Transaction =
+    Transaction(
+        id = id,
+        accountName = account.name,
+        categoryName = category.name,
+        categoryEmoji = category.emoji,
+        amount = amount,
+        transactionDate = transactionDate.parseDateTime(),
+        comment = comment,
+        isIncome = category.isIncome
+    )

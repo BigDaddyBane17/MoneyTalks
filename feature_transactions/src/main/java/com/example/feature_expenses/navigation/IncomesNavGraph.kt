@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import com.example.core.navigation.Routes
 import com.example.core.di.FeatureComponentProvider
+import com.example.feature_expenses.di.DaggerExpensesComponent
 import com.example.feature_expenses.ui.incomes.incomes_add.IncomesAddScreen
 import com.example.feature_expenses.ui.incomes.incomes_add.IncomesAddViewModel
 import com.example.feature_expenses.ui.incomes.incomes_edit.IncomesEditScreen
@@ -19,6 +20,10 @@ import com.example.feature_expenses.ui.incomes.incomes_history.IncomesHistoryVie
 import com.example.feature_expenses.ui.incomes.incomes_main.IncomesScreen
 import com.example.feature_expenses.ui.incomes.incomes_main.IncomesViewModel
 import com.example.feature_expenses.di.DaggerIncomesComponent
+import com.example.feature_expenses.ui.expenses.expenses_analysis.ExpensesAnalysisScreen
+import com.example.feature_expenses.ui.expenses.expenses_analysis.ExpensesAnalysisViewModel
+import com.example.feature_expenses.ui.incomes.incomes_analysis.IncomesAnalysisScreen
+import com.example.feature_expenses.ui.incomes.incomes_analysis.IncomesAnalysisViewModel
 
 fun NavGraphBuilder.incomesNavGraph(
     navController: NavHostController
@@ -93,8 +98,22 @@ fun NavGraphBuilder.incomesNavGraph(
             val viewModel: IncomesHistoryViewModel = viewModel(factory = viewModelFactory)
             
             IncomesHistoryScreen(
-                navigateToAnalysis = { /* TODO: Implement analysis navigation */ },
+                navigateToAnalysis = { navController.navigate(Routes.EARNINGS_ANALYSIS) },
                 onBack = { navController.popBackStack() },
+                viewModel = viewModel
+            )
+        }
+
+        composable(Routes.EARNINGS_ANALYSIS) {
+            val context = LocalContext.current
+            val featureComponentProvider = context.applicationContext as FeatureComponentProvider
+            val featureComponent = featureComponentProvider.provideFeatureComponent()
+            val expensesComponent = DaggerExpensesComponent.factory().create(featureComponent)
+            val viewModelFactory = expensesComponent.viewModelFactory()
+            val viewModel: IncomesAnalysisViewModel = viewModel(factory = viewModelFactory)
+
+            IncomesAnalysisScreen(
+                navigateBack = { navController.popBackStack() },
                 viewModel = viewModel
             )
         }

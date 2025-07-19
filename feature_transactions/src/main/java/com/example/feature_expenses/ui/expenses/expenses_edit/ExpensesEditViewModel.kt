@@ -55,21 +55,21 @@ class ExpensesEditViewModel @Inject constructor(
     private fun loadInitialData() {
         viewModelScope.launch {
             try {
-                _state.value = _state.value.copy(isLoading = true, error = null)
-
+                // Показываем лоадер только если данных о транзакции ещё нет
+                if (_state.value.amount.isBlank() && _state.value.selectedAccount == null && _state.value.selectedCategory == null) {
+                    _state.value = _state.value.copy(isLoading = true, error = null)
+                } else {
+                    _state.value = _state.value.copy(isLoading = false, error = null)
+                }
                 val accountsDeferred = async { accountRepository.getAccounts() }
                 val categoriesDeferred = async { categoryRepository.getCategoriesByType(false) }
-                
                 val accounts = accountsDeferred.await()
                 val categories = categoriesDeferred.await()
-                
                 _state.value = _state.value.copy(
                     accounts = accounts,
                     categories = categories
                 )
-
                 loadTransaction()
-                
             } catch (e: Exception) {
                 _state.value = _state.value.copy(
                     isLoading = false,
@@ -186,7 +186,7 @@ class ExpensesEditViewModel @Inject constructor(
                     transactionId = transactionId,
                     accountId = currentState.selectedAccount!!.id,
                     categoryId = currentState.selectedCategory!!.id,
-                    amount = currentState.amount, // Send positive amount - type is determined by category
+                    amount = currentState.amount,
                     transactionDate = currentState.selectedDateTime.atOffset(ZoneOffset.UTC)
                         .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
                     comment = currentState.comment.takeIf { it.isNotBlank() }

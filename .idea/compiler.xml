@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="MoneyTalks.app" target="21" />
+      <module name="MoneyTalks.core" target="21" />
+      <module name="MoneyTalks.core_domain" target="11" />
+      <module name="MoneyTalks.core_domain.main" target="11" />
+      <module name="MoneyTalks.core_domain.test" target="11" />
+      <module name="MoneyTalks.core_ui" target="21" />
+      <module name="MoneyTalks.data_account" target="21" />
+      <module name="MoneyTalks.data_categories" target="21" />
+      <module name="MoneyTalks.data_transactions" target="21" />
+      <module name="MoneyTalks.domain_account" target="11" />
+      <module name="MoneyTalks.domain_account.main" target="11" />
+      <module name="MoneyTalks.domain_account.test" target="11" />
+      <module name="MoneyTalks.domain_categories" target="11" />
+      <module name="MoneyTalks.domain_categories.main" target="11" />
+      <module name="MoneyTalks.domain_categories.test" target="11" />
+      <module name="MoneyTalks.domain_transaction" target="11" />
+      <module name="MoneyTalks.domain_transaction.main" target="11" />
+      <module name="MoneyTalks.domain_transaction.test" target="11" />
+      <module name="MoneyTalks.domain_transactions" target="21" />
+      <module name="MoneyTalks.feature_account" target="21" />
+      <module name="MoneyTalks.feature_account.data" target="21" />
+      <module name="MoneyTalks.feature_account.domain" target="11" />
+      <module name="MoneyTalks.feature_account.domain.main" target="11" />
+      <module name="MoneyTalks.feature_account.domain.test" target="11" />
+      <module name="MoneyTalks.feature_categories" target="21" />
+      <module name="MoneyTalks.feature_categories.data" target="21" />
+      <module name="MoneyTalks.feature_categories.domain" target="11" />
+      <module name="MoneyTalks.feature_categories.domain.main" target="11" />
+      <module name="MoneyTalks.feature_categories.domain.test" target="11" />
+      <module name="MoneyTalks.feature_expenses.domain.main" target="11" />
+      <module name="MoneyTalks.feature_expenses.domain.test" target="11" />
+      <module name="MoneyTalks.feature_incomes" target="21" />
+      <module name="MoneyTalks.feature_incomes.data" target="21" />
+      <module name="MoneyTalks.feature_incomes.domain" target="11" />
+      <module name="MoneyTalks.feature_incomes.domain.main" target="11" />
+      <module name="MoneyTalks.feature_incomes.domain.test" target="11" />
+      <module name="MoneyTalks.feature_settings" target="21" />
+      <module name="MoneyTalks.feature_settings.data" target="21" />
+      <module name="MoneyTalks.feature_transactions" target="21" />
+      <module name="MoneyTalks.feature_transactions.data" target="21" />
+      <module name="MoneyTalks.feature_transactions.domain" target="11" />
+      <module name="MoneyTalks.feature_transactions.domain.main" target="11" />
+      <module name="MoneyTalks.feature_transactions.domain.test" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

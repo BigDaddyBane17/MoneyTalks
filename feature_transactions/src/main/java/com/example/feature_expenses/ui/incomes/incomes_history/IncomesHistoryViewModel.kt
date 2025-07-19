@@ -34,10 +34,8 @@ class IncomesHistoryViewModel @Inject constructor(
             is IncomesHistoryIntent.LoadHistory -> {
                 _startDate.value = intent.startDate
                 _endDate.value = intent.endDate
-                // Данные загрузятся автоматически через observeAccountAndDates
             }
             is IncomesHistoryIntent.Refresh -> {
-                // Принудительно обновляем данные о текущем счете
                 refreshCurrentAccount()
             }
         }
@@ -95,17 +93,15 @@ class IncomesHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun loadHistoryForCurrentState() {
-        val currentState = _state.value
-        if (currentState.accountId != null) {
-            loadHistory(currentState.accountId, _startDate.value, _endDate.value)
-        }
-    }
 
     private fun loadHistory(accountId: Int, startDate: LocalDate, endDate: LocalDate) {
         viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, error = null)
-            
+            // Показываем лоадер только если данных ещё нет
+            if (_state.value.incomes.isEmpty()) {
+                _state.value = _state.value.copy(isLoading = true, error = null)
+            } else {
+                _state.value = _state.value.copy(isLoading = false, error = null)
+            }
             try {
                 getHistoryIncomesUseCase(accountId, startDate, endDate)
                     .catch { exception ->

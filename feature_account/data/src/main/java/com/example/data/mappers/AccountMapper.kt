@@ -1,17 +1,31 @@
 package com.example.data.mappers
 
+import com.example.core.data.entities.AccountEntity
 import com.example.data.models.AccountDto
 import com.example.core.domain.models.Account
-import javax.inject.Inject
+import com.example.data.models.AccountResponseDto
 
-class AccountMapper @Inject constructor() {
-    
-    fun toDomain(dto: AccountDto): Account {
-        return Account(
-            id = dto.id,
-            name = dto.name,
-            balance = dto.balance,
-            currency = dto.currency
-        )
-    }
-} 
+fun AccountDto.toEntity(): AccountEntity = AccountEntity(
+    id = id,
+    name = name,
+    balance = balance,
+    currency = currency
+)
+fun AccountEntity.toDomain(): Account = Account(
+    id = id,
+    name = name,
+    balance = balance,
+    currency = currency
+)
+fun Account.toEntity(): AccountEntity = AccountEntity(
+    id = id,
+    name = name,
+    balance = balance,
+    currency = currency
+)
+fun AccountResponseDto.toEntity(): AccountEntity = AccountEntity(
+    id = id,
+    name = name,
+    balance = balance,
+    currency = currency
+)

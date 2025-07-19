@@ -51,7 +51,6 @@ class AccountViewModel @Inject constructor(
             try {
                 val accounts = accountRepository.getAccounts()
                 if (accounts.isNotEmpty()) {
-                    // Загружаем сохраненный ID счета или выбираем первый
                     if (selectedAccountId == null) {
                         val currentAccount = getCurrentAccountUseCase.getCurrentAccount()
                         selectedAccountId = currentAccount?.id ?: accounts.first().id
@@ -62,11 +61,11 @@ class AccountViewModel @Inject constructor(
                         accounts = accounts
                     )
                 } else {
-                    _uiState.value = AccountUiState.Error("Нет доступных счетов")
+                    _uiState.value = AccountUiState.Error("Нет доступных счетов. Проверьте подключение к интернету.")
                 }
             } catch (e: Exception) {
                 _uiState.value = AccountUiState.Error(
-                    e.message ?: "Ошибка загрузки счетов"
+                    "Ошибка загрузки счетов: ${e.message ?: "Проверьте подключение к интернету"}"
                 )
             }
         }
@@ -82,7 +81,7 @@ class AccountViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.value = AccountUiState.Error(
-                    e.message ?: "Ошибка загрузки счета"
+                    "Ошибка загрузки счета: ${e.message ?: "Проверьте подключение к интернету"}"
                 )
             }
         }
@@ -112,7 +111,7 @@ class AccountViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.value = AccountUiState.Error(
-                    e.message ?: "Ошибка обновления валюты"
+                    "Ошибка обновления валюты: ${e.message ?: "Проверьте подключение к интернету"}"
                 )
             }
         }

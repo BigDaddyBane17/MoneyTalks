@@ -1,5 +1,6 @@
 package com.example.data.di
 
+import com.example.core.sync.SyncRepository
 import com.example.data.api.TransactionApiService
 import com.example.data.repository.TransactionRepositoryImpl
 import com.example.domain.repository.TransactionRepository

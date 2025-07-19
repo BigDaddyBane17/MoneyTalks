@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.dagger)
+    implementation(libs.androidx.work.runtime.ktx)
     ksp(libs.dagger.compiler)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.core.ktx)

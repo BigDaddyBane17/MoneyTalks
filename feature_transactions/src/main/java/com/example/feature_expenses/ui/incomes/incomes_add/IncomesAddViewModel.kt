@@ -63,13 +63,13 @@ class IncomesAddViewModel @Inject constructor(
             
             try {
                 val accounts = getAccountsUseCase()
-                val categories = getCategoriesUseCase(isIncome = true) // true for incomes
+                val categories = getCategoriesUseCase(isIncome = true)
                 
                 _state.value = _state.value.copy(
                     isLoading = false,
                     accounts = accounts,
                     categories = categories,
-                    selectedAccount = accounts.firstOrNull() // Auto-select first account
+                    selectedAccount = accounts.firstOrNull()
                 )
                 
                 validateForm()
@@ -113,7 +113,6 @@ class IncomesAddViewModel @Inject constructor(
     }
 
     private fun updateAmount(amount: String) {
-        // Allow only numbers and decimal separator
         val filteredAmount = amount.filter { it.isDigit() || it == '.' }
         
         val amountError = validateAmount(filteredAmount)
