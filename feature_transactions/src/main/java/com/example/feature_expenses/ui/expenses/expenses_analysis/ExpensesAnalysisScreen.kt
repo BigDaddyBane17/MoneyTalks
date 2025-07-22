@@ -64,11 +64,11 @@ fun ExpensesAnalysisScreen(
         )
     }
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State    .RESUMED) {
-            viewModel.handleIntent(ExpensesAnalysisIntent.Refresh)
-        }
-    }
+//    LaunchedEffect(lifecycleOwner) {
+//        lifecycleOwner.repeatOnLifecycle(Lifecycle.State    .RESUMED) {
+//            viewModel.handleIntent(ExpensesAnalysisIntent.Refresh)
+//        }
+//    }
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 

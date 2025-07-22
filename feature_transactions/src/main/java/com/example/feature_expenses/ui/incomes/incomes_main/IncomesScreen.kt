@@ -49,11 +49,11 @@ fun IncomesScreen(
     val state by viewModel.state.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.handleIntent(IncomesIntent.Refresh)
-        }
-    }
+//    LaunchedEffect(lifecycleOwner) {
+//        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+//            viewModel.handleIntent(IncomesIntent.Refresh)
+//        }
+//    }
 
     Scaffold(
         topBar = {

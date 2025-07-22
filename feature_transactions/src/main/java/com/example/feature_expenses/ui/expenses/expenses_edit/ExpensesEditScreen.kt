@@ -70,7 +70,6 @@ fun ExpensesEditScreen(
                     }
                 },
                 actions = {
-                    // Only save button
                     IconButton(
                         onClick = {
                             viewModel.handleIntent(ExpensesEditIntent.UpdateTransaction)
@@ -134,7 +133,6 @@ fun ExpensesEditScreen(
                     // Form content
                     Column(modifier = Modifier.weight(1f)) {
                         
-                        // Account Selection
                         ExposedDropdownMenuBox(
                             expanded = showAccountMenu,
                             onExpandedChange = { showAccountMenu = !showAccountMenu }
@@ -174,7 +172,6 @@ fun ExpensesEditScreen(
 
                         HorizontalDivider()
 
-                        // Category Selection
                         ExposedDropdownMenuBox(
                             expanded = showCategoryMenu,
                             onExpandedChange = { showCategoryMenu = !showCategoryMenu }
@@ -210,7 +207,6 @@ fun ExpensesEditScreen(
 
                         HorizontalDivider()
                         
-                        // Amount Input
                         ListItem(
                             modifier = Modifier,
                             title = "Сумма",
@@ -254,7 +250,6 @@ fun ExpensesEditScreen(
 
                         HorizontalDivider()
                         
-                        // Date Selection
                         ListItem(
                             modifier = Modifier,
                             title = "Дата",
@@ -286,7 +281,6 @@ fun ExpensesEditScreen(
 
                         HorizontalDivider()
                         
-                        // Time Selection
                         ListItem(
                             modifier = Modifier,
                             title = "Время",
@@ -330,7 +324,6 @@ fun ExpensesEditScreen(
 
                         HorizontalDivider()
                         
-                        // Comment Input
                         ListItem(
                             modifier = Modifier,
                             title = "Комментарий",
@@ -366,7 +359,6 @@ fun ExpensesEditScreen(
                         }
                     }
                     
-                    // Delete button at bottom
                     Button(
                         onClick = { showDeleteConfirmDialog = true },
                         enabled = !state.isUpdating && !state.isDeleting,

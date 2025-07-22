@@ -50,11 +50,11 @@ fun ExpensesScreen(
     val state by viewModel.state.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.handleIntent(ExpensesIntent.Refresh)
-        }
-    }
+//    LaunchedEffect(lifecycleOwner) {
+//        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+//            viewModel.handleIntent(ExpensesIntent.Refresh)
+//        }
+//    }
 
     Scaffold(
         topBar = {

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.core.workers.SyncWorker
@@ -14,14 +15,11 @@ import javax.inject.Singleton
 
 @Singleton
 class SyncManager @Inject constructor(
-    private val context: Context
+    context: Context
 ) {
 
     private val workManager = WorkManager.getInstance(context)
 
-    /**
-     * Запускает периодическую синхронизацию каждые 2 часа при наличии интернета
-     */
     fun startPeriodicSync() {
         Log.d("SyncManager", "Запускаем периодическую синхронизацию")
         
@@ -58,9 +56,6 @@ class SyncManager @Inject constructor(
         }
     }
 
-    /**
-     * Останавливает периодическую синхронизацию
-     */
     fun stopPeriodicSync() {
         workManager.cancelUniqueWork(SYNC_WORK_NAME)
     }
@@ -78,6 +73,19 @@ class SyncManager @Inject constructor(
                     }
                 }
             }
+    }
+
+    fun triggerSyncOnNetworkAvailable() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val syncWorkRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .addTag("sync_worker_instant")
+            .build()
+
+        workManager.enqueue(syncWorkRequest)
     }
 
     companion object {

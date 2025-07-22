@@ -1,6 +1,7 @@
 package com.example.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.core.data.dao.AccountDao
 import com.example.core.data.dao.CategoryDao
 import com.example.core.data.dao.TransactionDao
@@ -39,7 +40,7 @@ class TransactionRepositoryImpl @Inject constructor(
         transactionDate: String,
         comment: String?
     ): Result<Unit> {
-        android.util.Log.d("TransactionRepo", "Создаем транзакцию: accountId=$accountId, amount=$amount")
+        Log.d("TransactionRepo", "Создаем транзакцию: accountId=$accountId, amount=$amount")
         
         val account = accountDao.getById(accountId)
             ?: return Result.failure(Exception("Account not found"))
@@ -53,9 +54,9 @@ class TransactionRepositoryImpl @Inject constructor(
             comment = comment
         )
         return try {
-            android.util.Log.d("TransactionRepo", "Пытаемся создать транзакцию на сервере")
+            Log.d("TransactionRepo", "Пытаемся создать транзакцию на сервере")
             val response = apiService.createTransaction(request)
-            android.util.Log.d("TransactionRepo", "Транзакция создана на сервере: ID=${response.id}")
+            Log.d("TransactionRepo", "Транзакция создана на сервере: ID=${response.id}")
             transactionDao.insert(response.toEntity(
                 accountName = account.name,
                 categoryName = category.name,
@@ -64,9 +65,9 @@ class TransactionRepositoryImpl @Inject constructor(
             ))
             Result.success(Unit)
         } catch (e: Exception) {
-            android.util.Log.w("TransactionRepo", "Ошибка создания на сервере: ${e.message}, создаем локально")
+            Log.w("TransactionRepo", "Ошибка создания на сервере: ${e.message}, создаем локально")
             val localId = generateLocalId()
-            android.util.Log.d("TransactionRepo", "Создаем локальную транзакцию с ID: $localId")
+            Log.d("TransactionRepo", "Создаем локальную транзакцию с ID: $localId")
             
             val entity = TransactionEntity(
                 id = localId,
@@ -83,15 +84,15 @@ class TransactionRepositoryImpl @Inject constructor(
                 isDeleted = false,
             )
             transactionDao.insert(entity)
-            android.util.Log.d("TransactionRepo", "Локальная транзакция сохранена, isSynced=false")
+            Log.d("TransactionRepo", "Локальная транзакция сохранена, isSynced=false")
             
             // Запускаем синхронизацию
             try {
                 val syncManager = SyncManager(context)
-                android.util.Log.d("TransactionRepo", "Запускаем синхронизацию после создания локальной транзакции")
+                Log.d("TransactionRepo", "Запускаем синхронизацию после создания локальной транзакции")
                 syncManager.startPeriodicSync()
             } catch (e: Exception) {
-                android.util.Log.e("TransactionRepo", "Ошибка запуска синхронизации: ${e.message}")
+                Log.e("TransactionRepo", "Ошибка запуска синхронизации: ${e.message}")
             }
             
             Result.success(Unit)

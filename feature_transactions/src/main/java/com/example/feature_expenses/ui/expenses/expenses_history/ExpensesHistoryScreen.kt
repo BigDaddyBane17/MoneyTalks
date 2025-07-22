@@ -66,11 +66,11 @@ fun ExpensesHistoryScreen(
         )
     }
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.handleIntent(ExpensesHistoryIntent.Refresh)
-        }
-    }
+//    LaunchedEffect(lifecycleOwner) {
+//        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+//            viewModel.handleIntent(ExpensesHistoryIntent.Refresh)
+//        }
+//    }
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
