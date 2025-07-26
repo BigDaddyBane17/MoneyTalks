@@ -56,8 +56,41 @@ class SyncManager @Inject constructor(
         }
     }
 
-    fun stopPeriodicSync() {
+    fun updatePeriodicSync(hours: Int) {
+        Log.d("SyncManager", "Обновляем периодическую синхронизацию на $hours часов")
+        
+        try {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val syncWorkRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+                hours.toLong(), TimeUnit.HOURS
+            )
+                .setConstraints(constraints)
+                .addTag("sync_worker")
+                .build()
+
+            workManager.enqueueUniquePeriodicWork(
+                SYNC_WORK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                syncWorkRequest
+            )
+            
+            Log.d("SyncManager", "Периодическая синхронизация обновлена: $SYNC_WORK_NAME")
+                
+        } catch (e: Exception) {
+            Log.e("SyncManager", "Ошибка при обновлении синхронизации: ${e.message}", e)
+        }
+    }
+
+    fun cancelPeriodicSync() {
+        Log.d("SyncManager", "Отменяем периодическую синхронизацию")
         workManager.cancelUniqueWork(SYNC_WORK_NAME)
+    }
+
+    fun stopPeriodicSync() {
+        cancelPeriodicSync()
     }
 
     fun checkSyncStatus() {

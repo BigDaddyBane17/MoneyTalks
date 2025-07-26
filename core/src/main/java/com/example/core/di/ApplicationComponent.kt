@@ -2,6 +2,7 @@ package com.example.core.di
 
 import android.content.Context
 import com.example.core.domain.repository.SelectedAccountRepository
+import com.example.core.prefs.SettingsPreferences
 import com.example.core.prefs.UserPreferences
 import com.example.core.sync.SyncManager
 import com.example.core.usecase.SyncTransactionsUseCase
@@ -29,6 +30,7 @@ interface ApplicationComponent {
     fun context(): Context
     fun userPreferences(): UserPreferences
     fun selectedAccountRepository(): SelectedAccountRepository
+    fun settingsPreferences(): SettingsPreferences
     fun syncWorkerFactory(): SyncWorkerFactory
     fun syncManager(): SyncManager
     fun syncTransactionsUseCase(): SyncTransactionsUseCase

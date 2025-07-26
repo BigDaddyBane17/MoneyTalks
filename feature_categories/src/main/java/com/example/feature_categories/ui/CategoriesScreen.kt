@@ -9,6 +9,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -35,7 +36,7 @@ fun CategoriesScreen(
             CenterAlignedTopAppBar(
                 title = { Text("Мои статьи") },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF27E780)
+                    containerColor = MaterialTheme.colorScheme.primary
                 ),
             )
         },

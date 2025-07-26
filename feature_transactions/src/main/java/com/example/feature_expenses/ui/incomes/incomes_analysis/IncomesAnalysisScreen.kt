@@ -2,10 +2,12 @@ package com.example.feature_expenses.ui.incomes.incomes_analysis
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -34,6 +36,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.analytics.donutChart.ChartSlice
+import com.example.analytics.donutChart.DonutChart
+import com.example.analytics.donutChart.generateColorFromLabel
+import com.example.analytics.donutChart.prepareSlices
 import com.example.core_ui.R
 import com.example.core_ui.components.CustomDatePickerDialog
 import com.example.core_ui.components.ListItem
@@ -161,6 +167,29 @@ fun IncomesAnalysisScreen(
                         )
                     } else {
                         DateTimeFormatter.ofPattern("d MMMM yyyy, HH:mm", Locale("ru"))
+                        Spacer(Modifier.size(8.dp))
+
+                        DonutChart(
+                            slices = prepareSlices(
+                                uiState.expenses
+                                    .groupBy { it.categoryName }
+                                    .map { (category, list) ->
+                                        ChartSlice(
+                                            value = list.sumOf { it.amount.toDouble() },
+                                            label = category,
+                                            color = generateColorFromLabel(list.first().categoryEmoji),
+                                            icon = list.first().categoryEmoji
+                                        )
+                                    }
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp)
+                                .padding(vertical = 16.dp)
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        HorizontalDivider()
+
                         uiState.expenses
                             .sortedBy { it.transactionDate }
                             .forEach { transaction ->

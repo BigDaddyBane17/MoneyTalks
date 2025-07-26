@@ -10,6 +10,11 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.core.prefs.SettingsPreferences
+import com.example.core.di.ComponentProvider
+import com.example.core.di.FeatureComponentProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 private val DarkColorScheme = darkColorScheme(
     primary = GreenMain,
@@ -21,16 +26,6 @@ private val LightColorScheme = lightColorScheme(
     primary = GreenMain,
     background = BackgroundMain,
     surface = CardBackground,
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
@@ -40,14 +35,30 @@ fun MoneyTalksTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val context = LocalContext.current
+    val appComponent = (context.applicationContext as FeatureComponentProvider).provideFeatureComponent()
+    val settingsPreferences = appComponent.settingsPreferences()
+    
+    val appThemeId by settingsPreferences.appThemeId.collectAsState(initial = "default")
+    
+    val selectedTheme = ThemeProvider.getThemeById(appThemeId)
+    
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> DarkColorScheme.copy(
+            primary = selectedTheme.primaryColor,
+            secondary = selectedTheme.secondaryColor,
+            tertiary = selectedTheme.accentColor
+        )
+        else -> LightColorScheme.copy(
+            primary = selectedTheme.primaryColor,
+            secondary = selectedTheme.secondaryColor,
+            tertiary = selectedTheme.accentColor
+        )
     }
 
     MaterialTheme(
