@@ -93,10 +93,10 @@ fun SettingsScreen(
             itemsIndexed(settingsList) { _, (setting, onClick) ->
                 ListItem(
                     title = setting,
-                    trailingIcon = null,
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
                     onClick = onClick,
-                    modifier = Modifier.height(56.dp)
+                    modifier = Modifier.height(56.dp),
+                    trailingIcon = R.drawable.more_vert
                 )
                 HorizontalDivider()
             }

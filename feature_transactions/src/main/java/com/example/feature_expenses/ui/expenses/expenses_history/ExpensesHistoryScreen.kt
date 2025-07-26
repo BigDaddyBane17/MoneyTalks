@@ -122,7 +122,8 @@ fun ExpensesHistoryScreen(
                 onClick = {
                     pickerTarget = "start"
                     showDialog = true
-                }
+                },
+
             )
             HorizontalDivider()
             ListItem(
