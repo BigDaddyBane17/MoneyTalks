@@ -1,5 +1,6 @@
 package com.example.feature_account.ui.account_main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.domain.repository.AccountRepository
@@ -25,6 +26,7 @@ class AccountViewModel @Inject constructor(
     private var selectedAccountId: Int? = null
 
     init {
+        Log.d("AccountViewModel", "init called: ViewModel created")
         handleIntent(AccountIntent.LoadAccounts)
     }
 
@@ -40,12 +42,16 @@ class AccountViewModel @Inject constructor(
     fun selectAccount(accountId: Int) {
         selectedAccountId = accountId
         viewModelScope.launch {
-            selectedAccountRepository.setSelectedAccountId(accountId)
-            loadCurrentAccount()
+            val account = accountRepository.getAccountById(accountId)
+            if (account != null) {
+                selectedAccountRepository.setSelectedAccount(account)
+                loadCurrentAccount()
+            }
         }
     }
 
     private fun loadAccounts() {
+        Log.d("AccountViewModel", "loadAccounts called")
         viewModelScope.launch {
             _uiState.value = AccountUiState.Loading
             try {
@@ -98,12 +104,10 @@ class AccountViewModel @Inject constructor(
                         name = account.name,
                         currency = currencyCode
                     )
-                    
-                    // Обновляем состояние с новой валютой
+                    selectedAccountRepository.setSelectedAccount(updatedAccount)
                     val updatedAccounts = currentState.accounts.map { acc ->
                         if (acc.id == updatedAccount.id) updatedAccount else acc
                     }
-                    
                     _uiState.value = currentState.copy(
                         account = updatedAccount,
                         accounts = updatedAccounts

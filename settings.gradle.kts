@@ -34,3 +34,4 @@ include(":feature_transactions:data")
 include(":feature_transactions:domain")
 include(":feature_transactions")
 
+include(":analytics")

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.core.workers.SyncWorker
@@ -14,14 +15,11 @@ import javax.inject.Singleton
 
 @Singleton
 class SyncManager @Inject constructor(
-    private val context: Context
+    context: Context
 ) {
 
     private val workManager = WorkManager.getInstance(context)
 
-    /**
-     * Запускает периодическую синхронизацию каждые 2 часа при наличии интернета
-     */
     fun startPeriodicSync() {
         Log.d("SyncManager", "Запускаем периодическую синхронизацию")
         
@@ -58,11 +56,41 @@ class SyncManager @Inject constructor(
         }
     }
 
-    /**
-     * Останавливает периодическую синхронизацию
-     */
-    fun stopPeriodicSync() {
+    fun updatePeriodicSync(hours: Int) {
+        Log.d("SyncManager", "Обновляем периодическую синхронизацию на $hours часов")
+        
+        try {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val syncWorkRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+                hours.toLong(), TimeUnit.HOURS
+            )
+                .setConstraints(constraints)
+                .addTag("sync_worker")
+                .build()
+
+            workManager.enqueueUniquePeriodicWork(
+                SYNC_WORK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                syncWorkRequest
+            )
+            
+            Log.d("SyncManager", "Периодическая синхронизация обновлена: $SYNC_WORK_NAME")
+                
+        } catch (e: Exception) {
+            Log.e("SyncManager", "Ошибка при обновлении синхронизации: ${e.message}", e)
+        }
+    }
+
+    fun cancelPeriodicSync() {
+        Log.d("SyncManager", "Отменяем периодическую синхронизацию")
         workManager.cancelUniqueWork(SYNC_WORK_NAME)
+    }
+
+    fun stopPeriodicSync() {
+        cancelPeriodicSync()
     }
 
     fun checkSyncStatus() {
@@ -78,6 +106,19 @@ class SyncManager @Inject constructor(
                     }
                 }
             }
+    }
+
+    fun triggerSyncOnNetworkAvailable() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val syncWorkRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .addTag("sync_worker_instant")
+            .build()
+
+        workManager.enqueue(syncWorkRequest)
     }
 
     companion object {

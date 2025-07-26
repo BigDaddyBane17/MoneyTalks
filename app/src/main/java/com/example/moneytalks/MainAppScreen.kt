@@ -25,9 +25,22 @@ fun MainAppScreen() {
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-    val selectedTab = tabRoutes.indexOfFirst {
-        currentRoute?.startsWith(it.removeSuffix("_граф")) == true
-    }.let { if (it == -1) 0 else it }
+    
+    // Улучшенная логика определения выбранного таба
+    val selectedTab = when {
+        currentRoute?.startsWith("расходы") == true -> 0
+        currentRoute?.startsWith("доходы") == true -> 1
+        currentRoute?.startsWith("счет") == true -> 2
+        currentRoute?.startsWith("статьи") == true -> 3
+        currentRoute?.startsWith("настройки") == true || 
+        currentRoute?.startsWith("theme") == true ||
+        currentRoute?.startsWith("haptics") == true ||
+        currentRoute?.startsWith("pin_code") == true ||
+        currentRoute?.startsWith("sync") == true ||
+        currentRoute?.startsWith("language") == true ||
+        currentRoute?.startsWith("about") == true -> 4
+        else -> 0 // По умолчанию первый таб
+    }
 
     Scaffold(
         bottomBar = {

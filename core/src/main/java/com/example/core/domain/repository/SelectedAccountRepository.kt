@@ -1,11 +1,12 @@
 package com.example.core.domain.repository
 
+import com.example.core.domain.models.Account
 import kotlinx.coroutines.flow.StateFlow
 
 interface SelectedAccountRepository {
-    val selectedAccountIdFlow: StateFlow<Int?>
+    val selectedAccountFlow: StateFlow<Account?>
     
-    suspend fun setSelectedAccountId(accountId: Int)
-    suspend fun getSelectedAccountId(): Int?
+    suspend fun setSelectedAccount(account: Account)
+    suspend fun getSelectedAccount(): Account?
     suspend fun clearSelectedAccount()
 } 

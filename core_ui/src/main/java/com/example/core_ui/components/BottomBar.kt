@@ -7,16 +7,23 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-
+import com.example.core.di.ComponentProvider
+import com.example.core.di.FeatureComponentProvider
+import com.example.core.utils.HapticUtils
+import com.example.core.models.HapticMode
 import com.example.core_ui.R
-
+import androidx.compose.material3.MaterialTheme
+import com.example.core_ui.theme.ThemeProvider
 
 data class BottomNavigationItem(
     val title: String,
@@ -37,7 +44,21 @@ fun BottomBar(
     selectedTab: Int,
     navController: NavController
 ) {
-    NavigationBar(containerColor = Color(0xFFF3EDF7)) {
+    val context = LocalContext.current
+    val appComponent = (context.applicationContext as FeatureComponentProvider).provideFeatureComponent()
+    val settingsPreferences = appComponent.settingsPreferences()
+    
+    val hapticEnabled by settingsPreferences.hapticEnabled.collectAsState(initial = true)
+    val hapticMode by settingsPreferences.hapticMode.collectAsState(initial = HapticMode.MEDIUM.name)
+    val appThemeId by settingsPreferences.appThemeId.collectAsState(initial = "default")
+    
+    // Получаем выбранную тему для цветов
+    val selectedTheme = ThemeProvider.getThemeById(appThemeId)
+    
+    NavigationBar(
+        containerColor = selectedTheme.primaryColor.copy(alpha = 0.1f),
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 selected = selectedTab == index,
@@ -51,15 +72,26 @@ fun BottomBar(
                 label = {
                     Text(
                         text = item.title,
-                        color = Color(0xFF49454F),
+                        color = if (selectedTab == index) {
+                            selectedTheme.primaryColor
+                        } else {
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        },
                         fontSize = 11.sp
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF2AE881),
-                    indicatorColor = Color(0xFFD4FAE6),
+                    selectedIconColor = selectedTheme.primaryColor,
+                    indicatorColor = selectedTheme.primaryColor.copy(alpha = 0.2f),
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 ),
                 onClick = {
+                    // Выполняем хаптик при переключении таба
+                    if (hapticEnabled) {
+                        HapticUtils.performHapticFeedback(context, HapticMode.valueOf(hapticMode))
+                    }
+                    
                     val tabRoute = tabRoutes[index]
                     navController.navigate(tabRoute) {
                         popUpTo(navController.graph.findStartDestination().id) {

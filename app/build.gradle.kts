@@ -87,7 +87,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":core_ui"))
-
+    implementation(project(":analytics"))
     implementation(project(":feature_account"))
     implementation(project(":feature_account:data"))
     implementation(project(":feature_account:data"))

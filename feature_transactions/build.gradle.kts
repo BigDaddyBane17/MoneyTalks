@@ -43,6 +43,7 @@ android {
 dependencies {
     implementation(project(":core_ui"))
     implementation(project(":core"))
+    implementation(project(":analytics"))
     implementation(project(":feature_transactions:domain"))
     implementation(project(":feature_transactions:data"))
     implementation(platform(libs.androidx.compose.bom))

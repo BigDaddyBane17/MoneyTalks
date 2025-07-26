@@ -12,6 +12,7 @@ import com.example.core.sync.SyncManager
 import com.example.core.usecase.SyncTransactionsUseCase
 import com.example.core.viewmodel.SyncViewModel
 import com.example.core.workers.SyncWorkerFactory
+import com.example.feature_settings.di.SettingsModule
 import dagger.BindsInstance
 import dagger.Component
 import retrofit2.Retrofit
@@ -26,7 +27,8 @@ import javax.inject.Singleton
         DatabaseModule::class,
         WorkManagerModule::class,
         SyncModule::class,
-        ApiModule::class
+        ApiModule::class,
+        SettingsModule::class
     ]
 )
 interface AppComponent : FeatureComponent {

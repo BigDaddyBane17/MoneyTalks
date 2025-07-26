@@ -1,5 +1,6 @@
 package com.example.core.repository
 
+import com.example.core.domain.models.Account
 import com.example.core.domain.repository.SelectedAccountRepository
 import com.example.core.prefs.UserPreferences
 import kotlinx.coroutines.CoroutineScope
@@ -17,26 +18,25 @@ class SelectedAccountRepositoryImpl @Inject constructor(
     private val userPreferences: UserPreferences
 ) : SelectedAccountRepository {
 
-    private val _selectedAccountIdFlow = MutableStateFlow<Int?>(null)
-    override val selectedAccountIdFlow: StateFlow<Int?> = _selectedAccountIdFlow.asStateFlow()
+    private val _selectedAccountFlow = MutableStateFlow<Account?>(null)
+    override val selectedAccountFlow: StateFlow<Account?> = _selectedAccountFlow.asStateFlow()
 
     init {
         CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
-            _selectedAccountIdFlow.value = userPreferences.getSelectedAccountId()
+            _selectedAccountFlow.value = userPreferences.getSelectedAccount()
         }
     }
 
-    override suspend fun setSelectedAccountId(accountId: Int) {
-        userPreferences.setSelectedAccountId(accountId)
-        _selectedAccountIdFlow.value = accountId
+    override suspend fun setSelectedAccount(account: Account) {
+        userPreferences.setSelectedAccount(account)
+        _selectedAccountFlow.value = account
     }
 
-    override suspend fun getSelectedAccountId(): Int? {
-        return userPreferences.getSelectedAccountId()
+    override suspend fun getSelectedAccount(): Account? {
+        return _selectedAccountFlow.value
     }
 
     override suspend fun clearSelectedAccount() {
-        userPreferences.clearSelectedAccount()
-        _selectedAccountIdFlow.value = null
+        _selectedAccountFlow.value = null
     }
 } 

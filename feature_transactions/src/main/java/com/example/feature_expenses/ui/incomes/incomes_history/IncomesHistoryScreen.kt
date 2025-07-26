@@ -67,11 +67,11 @@ fun IncomesHistoryScreen(
         )
     }
 
-    LaunchedEffect(lifecycleOwner) {
-        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            viewModel.handleIntent(IncomesHistoryIntent.Refresh)
-        }
-    }
+//    LaunchedEffect(lifecycleOwner) {
+//        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+//            viewModel.handleIntent(IncomesHistoryIntent.Refresh)
+//        }
+//    }
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 

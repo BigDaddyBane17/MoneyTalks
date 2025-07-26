@@ -13,26 +13,10 @@ class GetCurrentAccountUseCase @Inject constructor(
 ) {
     
     operator fun invoke(): Flow<Account?> {
-        return selectedAccountRepository.selectedAccountIdFlow.map { selectedAccountId ->
-            if (selectedAccountId != null) {
-                accountRepository.getAccountById(selectedAccountId)
-            } else {
-                accountRepository.getAccounts().firstOrNull()?.also { account ->
-                    selectedAccountRepository.setSelectedAccountId(account.id)
-                }
-            }
-        }
+        return selectedAccountRepository.selectedAccountFlow
     }
     
     suspend fun getCurrentAccount(): Account? {
-        val selectedAccountId = selectedAccountRepository.getSelectedAccountId()
-        
-        return if (selectedAccountId != null) {
-            accountRepository.getAccountById(selectedAccountId)
-        } else {
-            accountRepository.getAccounts().firstOrNull()?.also { account ->
-                selectedAccountRepository.setSelectedAccountId(account.id)
-            }
-        }
+        return selectedAccountRepository.getSelectedAccount()
     }
 } 
